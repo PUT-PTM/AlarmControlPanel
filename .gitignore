@@ -26,6 +26,9 @@
 *.exe
 *.out
 *.app
+*.bin
+*.hex
+*.elf
 
 # CodeLite
 *.project
