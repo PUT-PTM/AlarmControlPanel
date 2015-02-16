@@ -63,7 +63,7 @@ static void Error_Handler(void);
 int main(void)
 {
 
-  /* STM32F4xx HAL library initialization:
+    /* STM32F4xx HAL library initialization:
        - Configure the Flash prefetch, Flash preread and Buffer caches
        - Systick timer is configured by default as source of time base, but user 
              can eventually implement his proper time base source (a general purpose 
@@ -72,20 +72,19 @@ int main(void)
              handled in milliseconds basis.
        - Low Level Initialization
      */
-  HAL_Init();
+    HAL_Init();
 
-  /* Configure the system clock to 168 MHz */
-  SystemClock_Config();
+    /* Configure the system clock to 168 MHz */
+    SystemClock_Config();
 
-
-  /* Add your application code here
-     */
-
-
-  /* Infinite loop */
-  while (1)
-  {
-  }
+    /* Infinite loop */
+    while (1)
+    {
+        Leds::turn_on({Led::Orange, Led::Green});
+        for (int i = 0; i <= 1000000; i++);
+        Leds::turn_off({Led::Orange, Led::Green});
+        for (int i = 0; i <= 1000000; i++);
+    }
 }
 
 /**
