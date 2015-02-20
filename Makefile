@@ -2,24 +2,25 @@
 PROJ_NAME=hal
 
 # sources' directories
-SRCSLIB = $(wildcard lib/*.c)
-SRCS = $(wildcard src/*.c)
-SRCS += src/startup_stm32f407xx.s # add startup file to build
-SRCSCPP += $(wildcard src/*.cpp)
+SRCSLIB   = $(wildcard lib/*.c)
+SRCS      = $(wildcard src/*.c)
+SRCSCPP  += $(wildcard src/*.cpp)
 
-BUILDDIR = build
-OBJSDIR = $(BUILDDIR)/objs
-DEPSDIR = $(BUILDDIR)/deps
-LDSRCS = ldscripts/libs.ld ldscripts/mem.ld ldscripts/sections.ld
+SRCS     += src/startup_stm32f407xx.s # add startup file to build
 
-vpath %.c src
+LDSRCS    = ldscripts/libs.ld ldscripts/mem.ld ldscripts/sections.ld
 
+BUILDDIR  = build
+OBJSDIR   = $(BUILDDIR)/objs
+DEPSDIR   = $(BUILDDIR)/deps
+
+VPATH = src lib
 ###################################################
 
 
-OBJS = $(SRCS:%.c=%.o)
-OBJSCPP = $(SRCSCPP:%.cpp=%.o)
-OBJSLIB = $(SRCSLIB:%.c=%.o)
+OBJS    = $(SRCS:%.c=$(OBJSDIR)/%.o)
+OBJSCPP = $(SRCSCPP:%.cpp=$(OBJSDIR)/%.o)
+OBJSLIB = $(SRCSLIB:%.c=$(OBJSDIR)/%.o)
 
 # C compiler's settings
 CC=arm-none-eabi-gcc
@@ -58,7 +59,11 @@ LDFLAGS = $(LDSRCS:%=-T%) -specs nosys.specs
 
 all: proj
 
-proj: $(PROJ_NAME).elf
+echo_variables:
+	@echo OBJS: $(OBJS)
+	@echo OBJSCPP: $(OBJSCPP)
+	@echo OBJSLIB: $(OBJSLIB)
+proj: $(PROJ_NAME).elf 
 
 $(PROJ_NAME).elf: $(OBJS) $(OBJSLIB) $(OBJSCPP)
 	@echo "  (LD) -o $@ $^"
@@ -66,21 +71,24 @@ $(PROJ_NAME).elf: $(OBJS) $(OBJSLIB) $(OBJSCPP)
 	$(OBJCOPY) -O ihex $(PROJ_NAME).elf $(PROJ_NAME).hex
 	$(OBJCOPY) -O binary $(PROJ_NAME).elf $(PROJ_NAME).bin
 
-#$(OBJS): | $(BUILDDIR)
+$(OBJS): | $(BUILDDIR)
 
-%.o : %.c
+$(OBJSDIR)/%.o : %.c 
 	@echo "  (CC) $@"
 	@$(CC) $(CFLAGS) $(CINCS) -c -o $@ $<
 
-%.o : %.cpp
+$(OBJSDIR)/%.o : %.cpp
 	@echo "  (CPP) $@"
 	@$(CPP) $(CPPFLAGS) $(CINCS) -c -o $@ $<
 
 
-#$(BUILDDIR):
-#	mkdir $(BUILDDIR)
-#	mkdir $(OBJSDIR)
-#	mkdir $(DEPSDIR)
+$(BUILDDIR):
+	mkdir $(BUILDDIR)
+	mkdir $(OBJSDIR)
+	mkdir $(DEPSDIR)
+	mkdir $(OBJSDIR)/src
+	mkdir $(OBJSDIR)/lib
+
 
 	
 
