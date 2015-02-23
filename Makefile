@@ -24,11 +24,8 @@ DEPSDIR   := $(BUILDDIR)/deps
 # You don't need to edit anything below this line
 ###################################################
 
-
-
-
 # add list of needed library's objects - OBJSLIB
-include objslib.mk
+-include objslib.mk
 
 OBJS    := $(SRCS:%.c=$(OBJSDIR)/%.o)
 OBJSCPP := $(SRCSCPP:%.cpp=$(OBJSDIR)/%.o)
@@ -70,16 +67,19 @@ LDFLAGS := $(LDSRCS:%=-T%) -specs nosys.specs
 
 .SUFFIXES:
 
-all: link_needed_lib proj
+all: proj
+depends: link_needed_lib
+
 
 echo_variables:
 	@echo OBJS: $(OBJS)
 	@echo OBJSCPP: $(OBJSCPP)
 	@echo OBJSLIB: $(OBJSLIB)
 	@echo DEPS: $(SRCS:src/%.c=$(DEPSDIR)/%.d)
+	@echo DEPS: $(SRCSCPP:src/%.cpp=$(DEPSDIR)/%.d)
 
-link_needed_lib: $(addprefix $(DEPSDIR)/, $(SRCS:%.c=%.P)) $(addprefix $(DEPSDIR)/, $(SRCSCPP:%.cpp=%.P))
-	@for i in "$(DEPSDIR)/src/*.P"; do \
+link_needed_lib: $(addprefix $(DEPSDIR)/, $(SRCS:%.c=%.d)) $(addprefix $(DEPSDIR)/, $(SRCSCPP:%.cpp=%.d))
+	@for i in "$(DEPSDIR)/src/*.d"; do \
 		sed 's/\\//g; s/ /\n/g;' $$i | \
 		grep 'stm32f4xx_.*\.h' | \
 		sed -e '/stm32f4xx_hal_conf.h/d'     \
@@ -95,11 +95,13 @@ link_needed_lib: $(addprefix $(DEPSDIR)/, $(SRCS:%.c=%.P)) $(addprefix $(DEPSDIR
 	@mv objslib.mk2 objslib.mk
 	@rm -f objslib.tmp
 	
-$(DEPSDIR)/%.P: %.c | $(BUILDDIR)
+$(DEPSDIR)/%.d: %.c | $(BUILDDIR)
 	@$(CC) $(CFLAGS) $(CINCS) -MM -o $@ $<
 
-$(DEPSDIR)/%.P: %.cpp | $(BUILDDIR)
+$(DEPSDIR)/%.d: %.cpp | $(BUILDDIR)
 	@$(CPP) $(CPPFLAGS) $(CINCS) -MM -MF $@ $<
+
+# add list of needed library's objects - OBJSLIB
 
 proj: $(PROJ_NAME).elf 
 
@@ -115,13 +117,13 @@ $(OBJSDIR)/%.o : %.c
 	@echo "  (CC) $@"
 	@$(CC) $(CFLAGS) $(CINCS) -MMD -MF $(DEPSDIR)/$(basename $<).d -c -o $@ $<
 
--include $(SRCS:src/%.c=$(DEPSDIR)/%.d)
+-include $(SRCS:%.c=$(DEPSDIR)/%.d)
 
 $(OBJSDIR)/%.o : %.cpp
 	@echo "  (CPP) $@"
 	@$(CPP) $(CPPFLAGS) $(CINCS) -MMD -MF $(DEPSDIR)/$(basename $<).d -c -o $@ $<
 
--include $(SRCSCPP:src/%.cpp=$(DEPSDIR)/%.d)
+-include $(SRCSCPP:%.cpp=$(DEPSDIR)/%.d)
 
 $(BUILDDIR):
 	mkdir $(BUILDDIR)
@@ -145,6 +147,7 @@ clean:
 	rm -f $(OBJSLIB)
 	rm -f $(OBJSCPP)
 	rm -rf $(BUILDDIR)
+	rm -f objslib.mk
 
 #for i in "$(DEPSDIR)/src/*.P"; do \
 #	sed 's/\\//g; s/ /\n/g;' $$i | \
