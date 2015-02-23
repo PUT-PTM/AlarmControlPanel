@@ -1,26 +1,38 @@
+# Configuration for Makefile
 # Project name and in the same time names of the executables.
 PROJ_NAME=hal
 
 # sources' directories
-SRCSLIB   = $(wildcard lib/*.c)
-SRCS      = $(wildcard src/*.c)
+SRCSLIB  := $(wildcard lib/*.c)
+SRCS     := $(wildcard src/*.c)
 SRCSCPP  += $(wildcard src/*.cpp)
 
-SRCS     += src/startup_stm32f407xx.s # add startup file to build
+# look for sources in given folders
+VPATH := src lib
 
-LDSRCS    = ldscripts/libs.ld ldscripts/mem.ld ldscripts/sections.ld
+# linker's scripts
+LDSRCS    := ldscripts/libs.ld ldscripts/mem.ld ldscripts/sections.ld
 
-BUILDDIR  = build
-OBJSDIR   = $(BUILDDIR)/objs
-DEPSDIR   = $(BUILDDIR)/deps
 
-VPATH = src lib
+# build directory configuration
+BUILDDIR  := build
+OBJSDIR   := $(BUILDDIR)/objs
+DEPSDIR   := $(BUILDDIR)/deps
+
+
+
+# You don't need to edit anything below this line
 ###################################################
 
 
-OBJS    = $(SRCS:%.c=$(OBJSDIR)/%.o)
-OBJSCPP = $(SRCSCPP:%.cpp=$(OBJSDIR)/%.o)
-OBJSLIB = $(SRCSLIB:%.c=$(OBJSDIR)/%.o)
+
+
+# add list of needed library's objects - OBJSLIB
+include objslib.mk
+
+OBJS    := $(SRCS:%.c=$(OBJSDIR)/%.o)
+OBJSCPP := $(SRCSCPP:%.cpp=$(OBJSDIR)/%.o)
+OBJSLIB := $(addprefix $(OBJSDIR)/, $(OBJSLIB))
 
 # C compiler's settings
 CC=arm-none-eabi-gcc
@@ -28,23 +40,23 @@ OBJCOPY=arm-none-eabi-objcopy
 
 
 # C compiler's options
-CFLAGS  = -g -Wall -std=c11
+CFLAGS := -g -Wall -std=c11
 CFLAGS += -mlittle-endian -mthumb -mcpu=cortex-m4 -mthumb-interwork
 CFLAGS += -mfloat-abi=soft 
 
 
 # Cpp compiler's settings
 CPP=arm-none-eabi-g++
-CPPFLAGS  = -g -Wall -std=c++11
+CPPFLAGS := -g -Wall -std=c++11
 CPPFLAGS += -mlittle-endian -mthumb -mcpu=cortex-m4 -mthumb-interwork
 CPPFLAGS += -mfloat-abi=soft 
 
 
 # headers' directories
-CINCS += -Iinclude -Iinclude/Legacy
+CINCS += -Iinclude -Ilib/include -Ilib/include/Legacy
 
 # linker's settings
-LDFLAGS = $(LDSRCS:%=-T%) -specs nosys.specs 
+LDFLAGS := $(LDSRCS:%=-T%) -specs nosys.specs 
 
 # advanced settings
 #
@@ -54,20 +66,46 @@ LDFLAGS = $(LDSRCS:%=-T%) -specs nosys.specs
 
 ###################################################
 
-.PHONY: all proj
+.PHONY: all proj depends echo_variables link_needed_lib
+
 .SUFFIXES:
 
-all: proj
+all: link_needed_lib proj
 
 echo_variables:
 	@echo OBJS: $(OBJS)
 	@echo OBJSCPP: $(OBJSCPP)
 	@echo OBJSLIB: $(OBJSLIB)
+	@echo DEPS: $(SRCS:src/%.c=$(DEPSDIR)/%.d)
+
+link_needed_lib: $(addprefix $(DEPSDIR)/, $(SRCS:%.c=%.P)) $(addprefix $(DEPSDIR)/, $(SRCSCPP:%.cpp=%.P))
+	@for i in "$(DEPSDIR)/src/*.P"; do \
+		sed 's/\\//g; s/ /\n/g;' $$i | \
+		grep 'stm32f4xx_.*\.h' | \
+		sed -e '/stm32f4xx_hal_conf.h/d'     \
+		    -e '/stm32f4xx_hal_def.h/d'      \
+		    -e '/stm32f4xx_hal_gpio_ex.h/d;' \
+		    -e '/stm32f4xx_it.h/d;' \
+			-e 's:/include::g; s/h$$/o/g' >> objslib.tmp ;\
+	done
+	@rm -f objslib.mk
+	@echo 'OBJSLIB :=' >> objslib.mk
+	@sort -u objslib.tmp >> objslib.mk
+	@cat objslib.mk | tr '\n' ' '> objslib.mk2
+	@mv objslib.mk2 objslib.mk
+	@rm -f objslib.tmp
+	
+$(DEPSDIR)/%.P: %.c | $(BUILDDIR)
+	@$(CC) $(CFLAGS) $(CINCS) -MM -o $@ $<
+
+$(DEPSDIR)/%.P: %.cpp | $(BUILDDIR)
+	@$(CPP) $(CPPFLAGS) $(CINCS) -MM -MF $@ $<
+
 proj: $(PROJ_NAME).elf 
 
 $(PROJ_NAME).elf: $(OBJS) $(OBJSLIB) $(OBJSCPP)
 	@echo "  (LD) -o $@ $^"
-	@$(CPP) $(CPPFLAGS) $(LDFLAGS) $(CINCS) -o $@ $^ $(LDLIBS)
+	@$(CPP) $(CPPFLAGS) $(LDFLAGS) $(CINCS) -o $@ $^ src/startup_stm32f407xx.s $(LDLIBS)
 	$(OBJCOPY) -O ihex $(PROJ_NAME).elf $(PROJ_NAME).hex
 	$(OBJCOPY) -O binary $(PROJ_NAME).elf $(PROJ_NAME).bin
 
@@ -75,24 +113,27 @@ $(OBJS): | $(BUILDDIR)
 
 $(OBJSDIR)/%.o : %.c 
 	@echo "  (CC) $@"
-	@$(CC) $(CFLAGS) $(CINCS) -c -o $@ $<
+	@$(CC) $(CFLAGS) $(CINCS) -MMD -MF $(DEPSDIR)/$(basename $<).d -c -o $@ $<
+
+-include $(SRCS:src/%.c=$(DEPSDIR)/%.d)
 
 $(OBJSDIR)/%.o : %.cpp
 	@echo "  (CPP) $@"
-	@$(CPP) $(CPPFLAGS) $(CINCS) -c -o $@ $<
+	@$(CPP) $(CPPFLAGS) $(CINCS) -MMD -MF $(DEPSDIR)/$(basename $<).d -c -o $@ $<
 
+-include $(SRCSCPP:src/%.cpp=$(DEPSDIR)/%.d)
 
 $(BUILDDIR):
 	mkdir $(BUILDDIR)
 	mkdir $(OBJSDIR)
-	mkdir $(DEPSDIR)
 	mkdir $(OBJSDIR)/src
 	mkdir $(OBJSDIR)/lib
-
+	mkdir $(DEPSDIR)
+	mkdir $(DEPSDIR)/src
+	mkdir $(DEPSDIR)/lib
 
 	
 
-#-include $(SRCS:%.c=$(DEPSDIR)/%.d)
 
 # Take care about non-existing headers.
 # If a header doesn't exist, it assumes, that the header has been changed.
@@ -104,3 +145,9 @@ clean:
 	rm -f $(OBJSLIB)
 	rm -f $(OBJSCPP)
 	rm -rf $(BUILDDIR)
+
+#for i in "$(DEPSDIR)/src/*.P"; do \
+#	sed 's/\\//g; s/ /\n/g;' $$i | \
+#	grep 'stm32f4xx_.*\.h' | \
+#	sed -e '/stm32f4xx_hal_conf.h/d; s:/include::g; s/h$$/o/g' >> objslib.tmp \
+#done
