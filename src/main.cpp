@@ -15,7 +15,7 @@
   *   1. Redistributions of source code must retain the above copyright notice,
   *      this list of conditions and the following disclaimer.
   *   2. Redistributions in binary form must reproduce the above copyright notice,
-  *      this list of conditions and the following disclaimer in the documentation
+  *      this 	list of conditions and the following disclaimer in the documentation
   *      and/or other materials provided with the distribution.
   *   3. Neither the name of STMicroelectronics nor the names of its contributors
   *      may be used to endorse or promote products derived from this software
@@ -73,9 +73,13 @@ int main(void)
        - Low Level Initialization
      */
     HAL_Init();
+	
 
     /* Configure the system clock to 168 MHz */
     SystemClock_Config();
+    
+    Scheduler scheduler;
+    scheduler.read_registers();
 
     /* Infinite loop */
     while (1)
