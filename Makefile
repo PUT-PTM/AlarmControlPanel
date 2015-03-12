@@ -53,7 +53,7 @@ CPPFLAGS += -mfloat-abi=soft
 CINCS += -Iinclude -Ilib/include -Ilib/include/Legacy
 
 # linker's settings
-LDFLAGS := $(LDSRCS:%=-T%) -specs nosys.specs 
+LDFLAGS := $(LDSRCS:%=-T%) -specs nosys.specs --specs=rdimon.specs -lc -lrdimon
 
 # advanced settings
 #
