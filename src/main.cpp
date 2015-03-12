@@ -26,9 +26,6 @@ int main(void)
     /* Configure the system clock to 168 MHz */
     SystemClock_Config();
 
-    Scheduler scheduler;
-    scheduler.read_registers();
-
     while (1)
     {
         std::printf("Semihosting test");
