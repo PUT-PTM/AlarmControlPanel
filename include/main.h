@@ -1,6 +1,6 @@
 /**
   ******************************************************************************
-  * @file    Templates/Inc/main.h 
+  * @file    Templates/Inc/main.h
   * @author  MCD Application Team
   * @version V1.2.0
   * @date    26-December-2014
@@ -34,7 +34,7 @@
   *
   ******************************************************************************
   */
-  
+
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __MAIN_H
 #define __MAIN_H
@@ -43,6 +43,7 @@
 #include "stm32f4xx_hal.h"
 #include "Leds.hpp"
 #include "Scheduler.hpp"
+#include <cstdio>
 
 /* Exported types ------------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/
