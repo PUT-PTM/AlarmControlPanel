@@ -37,16 +37,18 @@ OBJCOPY=arm-none-eabi-objcopy
 
 
 # C compiler's options
-CFLAGS := -g -Wall -std=c11
+CFLAGS := -Wall -std=c11
 CFLAGS += -mlittle-endian -mthumb -mcpu=cortex-m4 -mthumb-interwork
 CFLAGS += -mfloat-abi=soft 
 
 
 # Cpp compiler's settings
 CPP=arm-none-eabi-g++
-CPPFLAGS := -g -Wall -std=c++11
+CPPFLAGS := -Wall -std=c++11
 CPPFLAGS += -mlittle-endian -mthumb -mcpu=cortex-m4 -mthumb-interwork
 CPPFLAGS += -mfloat-abi=soft 
+
+
 
 
 # headers' directories
@@ -63,14 +65,22 @@ LDFLAGS := $(LDSRCS:%=-T%) -specs nosys.specs --specs=rdimon.specs -lc -lrdimon
 
 ###################################################
 
-.PHONY: all proj depends echo_variables link_needed_lib
+.PHONY: all proj depends debug release echo_variables link_needed_lib
 
 .SUFFIXES:
 
 all: proj
+release: proj
+debug: CFLAGS   += -g
+debug: CPPFLAGS += -g -DDEBUG
+debug: proj
+
 depends: link_needed_lib
 
 
+#################################################
+#        debug and dependancy generation        #
+#################################################
 echo_variables:
 	@echo OBJS: $(OBJS)
 	@echo OBJSCPP: $(OBJSCPP)
@@ -101,7 +111,11 @@ $(DEPSDIR)/%.d: %.c | $(BUILDDIR)
 $(DEPSDIR)/%.d: %.cpp | $(BUILDDIR)
 	@$(CPP) $(CPPFLAGS) $(CINCS) -MM -MF $@ $<
 
+#################################################
+
 # add list of needed library's objects - OBJSLIB
+
+
 
 proj: $(PROJ_NAME).elf 
 

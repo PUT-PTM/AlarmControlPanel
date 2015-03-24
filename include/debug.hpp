@@ -1,4 +1,5 @@
 #ifndef DEBUG_HPP
+#define DEBUG_HPP
     #ifdef DEBUG
         #include <cstdio>
         
@@ -8,7 +9,6 @@
          * Disable STDOUT buffering to enable printing before a newline 
          * character or buffer flush.
          */
-        std::setbuf(stdout, NULL);
     #else
         #define debug(format, ...)
     #endif /* DEBUG */
