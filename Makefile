@@ -3,15 +3,18 @@
 PROJ_NAME=hal
 
 # sources' directories
-SRCSLIB  := $(wildcard lib/*.c)
-SRCS     := $(wildcard src/*.c)
-SRCSCPP  += $(wildcard src/*.cpp)
+SRCS         := $(wildcard src/*.c) $(wildcard lib/FreeRTOS/*.c)
+SRCSCPP      := $(wildcard src/*.cpp)
 
+# headers' directories
+CINCS += -Iinclude -Ilib/stm32cubef4/include -Ilib/include/stm32cubef4/Legacy -Ilib/FreeRTOS/include
+
+###
+# TODO: Probably we don't need this section
+#
 # look for sources in given folders
-VPATH := src lib
-
-# linker's scripts
-LDSRCS    := ldscripts/libs.ld ldscripts/mem.ld ldscripts/sections.ld
+# VPATH := src lib
+###
 
 
 # build directory configuration
@@ -39,23 +42,20 @@ OBJCOPY=arm-none-eabi-objcopy
 # C compiler's options
 CFLAGS := -Wall -std=c11
 CFLAGS += -mlittle-endian -mthumb -mcpu=cortex-m4 -mthumb-interwork
-CFLAGS += -mfloat-abi=soft 
-
+CFLAGS += -mfpu=fpv4-sp-d16 -mfloat-abi=softfp
 
 # Cpp compiler's settings
 CPP=arm-none-eabi-g++
 CPPFLAGS := -Wall -std=c++11
 CPPFLAGS += -mlittle-endian -mthumb -mcpu=cortex-m4 -mthumb-interwork
-CPPFLAGS += -mfloat-abi=soft 
+CPPFLAGS += -mfpu=fpv4-sp-d16 -mfloat-abi=softfp
 
-
-
-
-# headers' directories
-CINCS += -Iinclude -Ilib/include -Ilib/include/Legacy
+# linker's scripts
+LDSRCS    := ldscripts/libs.ld ldscripts/mem.ld ldscripts/sections.ld
 
 # linker's settings
 LDFLAGS := $(LDSRCS:%=-T%) -specs nosys.specs --specs=rdimon.specs -lc -lrdimon
+
 
 # advanced settings
 #
@@ -69,11 +69,11 @@ LDFLAGS := $(LDSRCS:%=-T%) -specs nosys.specs --specs=rdimon.specs -lc -lrdimon
 
 .SUFFIXES:
 
-all: proj
-release: proj
 debug: CFLAGS   += -g
 debug: CPPFLAGS += -g -DDEBUG
 debug: proj
+all: proj
+release: proj
 
 depends: link_needed_lib
 
@@ -120,7 +120,7 @@ $(DEPSDIR)/%.d: %.cpp | $(BUILDDIR)
 proj: $(PROJ_NAME).elf 
 
 $(PROJ_NAME).elf: $(OBJS) $(OBJSLIB) $(OBJSCPP)
-	@echo "  (LD) -o $@ $^"
+	@echo "  (LDCPP) -o $@ $^"
 	@$(CPP) $(CPPFLAGS) $(LDFLAGS) $(CINCS) -o $@ $^ src/startup_stm32f407xx.s $(LDLIBS)
 	$(OBJCOPY) -O ihex $(PROJ_NAME).elf $(PROJ_NAME).hex
 	$(OBJCOPY) -O binary $(PROJ_NAME).elf $(PROJ_NAME).bin
@@ -139,15 +139,14 @@ $(OBJSDIR)/%.o : %.cpp
 
 -include $(SRCSCPP:%.cpp=$(DEPSDIR)/%.d)
 
+# TODO: maybe dynamic creation of directories
 $(BUILDDIR):
-	mkdir $(BUILDDIR)
-	mkdir $(OBJSDIR)
-	mkdir $(OBJSDIR)/src
-	mkdir $(OBJSDIR)/lib
-	mkdir $(DEPSDIR)
-	mkdir $(DEPSDIR)/src
-	mkdir $(DEPSDIR)/lib
-
+	mkdir -p $(OBJSDIR)/src
+	mkdir -p $(OBJSDIR)/lib/stm32cubef4
+	mkdir -p $(OBJSDIR)/lib/FreeRTOS
+	mkdir -p $(DEPSDIR)/src
+	mkdir -p $(DEPSDIR)/lib/stm32cubef4
+	mkdir -p $(DEPSDIR)/lib/FreeRTOS
 	
 
 
@@ -156,15 +155,8 @@ $(BUILDDIR):
 # see: GNU Make Manual "Rules without Commands or Prerequisites"
 %.h:
 
-
 clean:
 	rm -f $(OBJSLIB)
 	rm -f $(OBJSCPP)
 	rm -rf $(BUILDDIR)
 	rm -f objslib.mk
-
-#for i in "$(DEPSDIR)/src/*.P"; do \
-#	sed 's/\\//g; s/ /\n/g;' $$i | \
-#	grep 'stm32f4xx_.*\.h' | \
-#	sed -e '/stm32f4xx_hal_conf.h/d; s:/include::g; s/h$$/o/g' >> objslib.tmp \
-#done
