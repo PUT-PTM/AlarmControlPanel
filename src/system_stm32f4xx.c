@@ -63,7 +63,6 @@
   * @{
   */
 
-#define STM32F407xx 1
 #include "stm32f4xx.h"
 
 #if !defined  (HSE_VALUE) 

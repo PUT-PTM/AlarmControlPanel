@@ -2,29 +2,25 @@
 
 void vLedTask1(void *args)
 {
+     for (int i = 0; i <= 1000000; i++);
      while (7) {
-          for (int i = 0; i < 7; ++i)
-          {
                Leds::turn_on({Led::Orange, Led::Green});
                for (int i = 0; i <= 1000000; i++);
                Leds::turn_off({Led::Orange, Led::Green});
                for (int i = 0; i <= 1000000; i++);
           }
-          taskYIELD();
+//  manual interrupt (manual context switch)       taskYIELD();
      }
 }
 
 void vLedTask2(void *args)
 {
      while (7) {
-          for (int i = 0; i < 7; ++i)
-          {
                Leds::turn_on({Led::Blue, Led::Red});
                for (int i = 0; i <= 1000000; i++);
                Leds::turn_off({Led::Blue, Led::Red});
                for (int i = 0; i <= 1000000; i++);
-          }
-          taskYIELD();
+//  manual interrupt (manual context switch)       taskYIELD();
      }
 }
 

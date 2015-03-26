@@ -22,7 +22,7 @@ BUILDDIR  := build
 OBJSDIR   := $(BUILDDIR)/objs
 DEPSDIR   := $(BUILDDIR)/deps
 
-
+DEFINES   := -DSTM32F407xx
 
 # You don't need to edit anything below this line
 ###################################################
@@ -43,12 +43,14 @@ OBJCOPY=arm-none-eabi-objcopy
 CFLAGS := -Wall -std=c11
 CFLAGS += -mlittle-endian -mthumb -mcpu=cortex-m4 -mthumb-interwork
 CFLAGS += -mfpu=fpv4-sp-d16 -mfloat-abi=softfp
+CFLAGS += $(DEFINES)
 
 # Cpp compiler's settings
 CPP=arm-none-eabi-g++
 CPPFLAGS := -Wall -std=c++11
 CPPFLAGS += -mlittle-endian -mthumb -mcpu=cortex-m4 -mthumb-interwork
 CPPFLAGS += -mfpu=fpv4-sp-d16 -mfloat-abi=softfp
+CPPFLAGS += $(DEFINES)
 
 # linker's scripts
 LDSRCS    := ldscripts/libs.ld ldscripts/mem.ld ldscripts/sections.ld
