@@ -73,6 +73,8 @@ debug: CFLAGS   += -g
 debug: CPPFLAGS += -g -DDEBUG
 debug: proj
 all: proj
+# release: CFLAGS   += -O2
+# release: CPPFLAGS += -O2
 release: proj
 
 depends: link_needed_lib

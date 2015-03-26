@@ -1,5 +1,33 @@
 #include "main.hpp"
 
+void vLedTask1(void *args)
+{
+     while (7) {
+          for (int i = 0; i < 7; ++i)
+          {
+               Leds::turn_on({Led::Orange, Led::Green});
+               for (int i = 0; i <= 1000000; i++);
+               Leds::turn_off({Led::Orange, Led::Green});
+               for (int i = 0; i <= 1000000; i++);
+          }
+          taskYIELD();
+     }
+}
+
+void vLedTask2(void *args)
+{
+     while (7) {
+          for (int i = 0; i < 7; ++i)
+          {
+               Leds::turn_on({Led::Blue, Led::Red});
+               for (int i = 0; i <= 1000000; i++);
+               Leds::turn_off({Led::Blue, Led::Red});
+               for (int i = 0; i <= 1000000; i++);
+          }
+          taskYIELD();
+     }
+}
+
 int main()
 {
 
@@ -14,16 +42,13 @@ int main()
      */
     HAL_Init();
 
-
     /* Configure the system clock to 168 MHz */
     SystemClock_Config();
 
-    while (1)
-    {
-        debug("Test\n");
-        Leds::turn_on({Led::Orange, Led::Green});
-        for (int i = 0; i <= 1000000; i++);
-        Leds::turn_off({Led::Orange, Led::Green});
-        for (int i = 0; i <= 1000000; i++);
-    }
+    
+    xTaskCreate(vLedTask1, "Leds1", 100, NULL, 3, NULL);
+    xTaskCreate(vLedTask2, "Leds2", 100, NULL, 3, NULL);
+    vTaskStartScheduler();
+
+    return 0;
 }
