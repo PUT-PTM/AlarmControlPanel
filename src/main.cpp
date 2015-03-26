@@ -8,7 +8,6 @@ void vLedTask1(void *args)
                for (int i = 0; i <= 1000000; i++);
                Leds::turn_off({Led::Orange, Led::Green});
                for (int i = 0; i <= 1000000; i++);
-          }
 //  manual interrupt (manual context switch)       taskYIELD();
      }
 }

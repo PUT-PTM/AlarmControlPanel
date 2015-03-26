@@ -40,6 +40,10 @@
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f4xx_it.h"
 
+void xPortSysTickHandler( void );
+void HAL_IncTick(void);
+
+
 /** @addtogroup STM32F4xx_HAL_Examples
   * @{
   */
@@ -152,10 +156,11 @@ void DebugMon_Handler(void)
   * @param  None
   * @retval None
   */
-// void SysTick_Handler(void)
-// {
-//   HAL_IncTick();
-// }
+void SysTick_Handler(void)
+{
+  HAL_IncTick();
+  xPortSysTickHandler();
+}
 
 /******************************************************************************/
 /*                 STM32F4xx Peripherals Interrupt Handlers                   */
