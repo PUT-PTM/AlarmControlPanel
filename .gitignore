@@ -4,6 +4,12 @@
 *.o
 *.obj
 
+# Build directory
+build
+
+# Make regenerated files
+*.mk
+
 # Precompiled Headers
 *.gch
 *.pch
