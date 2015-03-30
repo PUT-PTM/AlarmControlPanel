@@ -1,0 +1,3 @@
+[submodule "lib/stm32cubef4"]
+	path = lib/stm32cubef4
+	url = git@github.com:Plytirex/stm32cubef4.git
