@@ -42,8 +42,10 @@ int main()
     /* Configure the system clock to 168 MHz */
     SystemClock_Config();
     
-    xTaskCreate(vLedTask1, "Leds1", 500, NULL, 3, NULL);
-    xTaskCreate(vLedTask2, "Leds2", 500, NULL, 3, NULL);
+    // Stack size 100 can be easly exceeded when extending tasks
+    // TODO(rivi): enable stack overflow detection
+    xTaskCreate(vLedTask1, "Leds1", 100, NULL, 3, NULL);
+    xTaskCreate(vLedTask2, "Leds2", 100, NULL, 3, NULL);
     vTaskStartScheduler();
 
     return 0;
