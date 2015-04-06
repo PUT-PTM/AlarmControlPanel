@@ -6,5 +6,6 @@
 #include "Leds.hpp"
 #include "FreeRTOS.h"
 #include "task.h"
+#include "handlers.hpp"
 
 #endif /* MAIN_H */

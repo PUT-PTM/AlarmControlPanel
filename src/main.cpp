@@ -43,7 +43,6 @@ int main()
     SystemClock_Config();
     
     // Stack size 100 can be easly exceeded when extending tasks
-    // TODO(rivi): enable stack overflow detection
     xTaskCreate(vLedTask1, "Leds1", 100, NULL, 3, NULL);
     xTaskCreate(vLedTask2, "Leds2", 100, NULL, 3, NULL);
     vTaskStartScheduler();
