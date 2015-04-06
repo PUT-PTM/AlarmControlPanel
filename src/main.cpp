@@ -2,25 +2,27 @@
 
 void vLedTask1(void *args)
 {
-     for (int i = 0; i <= 1000000; i++);
-     while (7) {
-               Leds::turn_on({Led::Orange, Led::Green});
-               for (int i = 0; i <= 1000000; i++);
-               Leds::turn_off({Led::Orange, Led::Green});
-               for (int i = 0; i <= 1000000; i++);
+    auto leds = Leds({OrangeLed, GreenLed});
+    for (int i = 0; i <= 1000000; i++);
+    while (7) {        
+        leds.turn_on();
+        for (int i = 0; i <= 1000000; i++);
+        leds.turn_off();
+        for (int i = 0; i <= 1000000; i++);
 //  manual interrupt (manual context switch)       taskYIELD();
      }
 }
 
 void vLedTask2(void *args)
 {
-     while (7) {
-               Leds::turn_on({Led::Blue, Led::Red});
-               for (int i = 0; i <= 1000000; i++);
-               Leds::turn_off({Led::Blue, Led::Red});
-               for (int i = 0; i <= 1000000; i++);
+    auto leds = Leds({BlueLed, RedLed});
+    while (7) {
+        leds.turn_on();
+        for (int i = 0; i <= 1000000; i++);
+        leds.turn_off();
+        for (int i = 0; i <= 1000000; i++);
 //  manual interrupt (manual context switch)       taskYIELD();
-     }
+    }
 }
 
 int main()
@@ -39,10 +41,9 @@ int main()
 
     /* Configure the system clock to 168 MHz */
     SystemClock_Config();
-
     
-    xTaskCreate(vLedTask1, "Leds1", 100, NULL, 3, NULL);
-    xTaskCreate(vLedTask2, "Leds2", 100, NULL, 3, NULL);
+    xTaskCreate(vLedTask1, "Leds1", 500, NULL, 3, NULL);
+    xTaskCreate(vLedTask2, "Leds2", 500, NULL, 3, NULL);
     vTaskStartScheduler();
 
     return 0;
