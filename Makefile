@@ -40,14 +40,14 @@ OBJCOPY=arm-none-eabi-objcopy
 
 
 # C compiler's options
-CFLAGS := -Wall -std=c11
+CFLAGS := -Wall -std=c11 -Os
 CFLAGS += -mlittle-endian -mthumb -mcpu=cortex-m4 -mthumb-interwork
 CFLAGS += -mfpu=fpv4-sp-d16 -mfloat-abi=softfp
 CFLAGS += $(DEFINES)
 
 # Cpp compiler's settings
 CPP=arm-none-eabi-g++
-CPPFLAGS := -Wall -std=c++11
+CPPFLAGS := -Wall -std=c++11 -Os
 CPPFLAGS += -mlittle-endian -mthumb -mcpu=cortex-m4 -mthumb-interwork
 CPPFLAGS += -mfpu=fpv4-sp-d16 -mfloat-abi=softfp
 CPPFLAGS += $(DEFINES)
@@ -75,8 +75,6 @@ debug: CFLAGS   += -g
 debug: CPPFLAGS += -g -DDEBUG
 debug: proj
 all: proj
-# release: CFLAGS   += -O2
-# release: CPPFLAGS += -O2
 release: proj
 
 depends: link_needed_lib

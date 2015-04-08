@@ -8,10 +8,7 @@ namespace GPIO {
             pins_bitmask |= std::bitset<16>(static_cast<uint16_t>(pin));
         }
         
-        try {
-            ext::find(initialized_peripherals.begin(), initialized_peripherals.end(), peripheral);
-        }
-        catch (...) {
+        if (std::find(initialized_peripherals.begin(), initialized_peripherals.end(), peripheral) == initialized_peripherals.end()) {
             if (peripheral == GPIOA)
                 __GPIOA_CLK_ENABLE();
             else if (peripheral == GPIOB)
@@ -48,13 +45,10 @@ namespace GPIO {
     GPIOPins::~GPIOPins() {
         HAL_GPIO_DeInit(peripheral, pins_bitmask.to_ulong());
         
-        auto element_to_erase = ext::find(initialized_peripherals.begin(), initialized_peripherals.end(), peripheral);
+        auto element_to_erase = std::find(initialized_peripherals.begin(), initialized_peripherals.end(), peripheral);
         initialized_peripherals.erase(element_to_erase);
         
-        try {
-            ext::find(initialized_peripherals.begin(), initialized_peripherals.end(), peripheral);
-        }
-        catch (...) {
+        if (std::find(initialized_peripherals.begin(), initialized_peripherals.end(), peripheral) == initialized_peripherals.end()) {
             if (peripheral == GPIOA)
                 __GPIOA_CLK_DISABLE();
             else if (peripheral == GPIOB)

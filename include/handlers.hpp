@@ -1,4 +1,3 @@
-#include <stdexcept>
 #include "debug.hpp"
 
 #include "FreeRTOS.h"
