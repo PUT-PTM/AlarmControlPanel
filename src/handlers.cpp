@@ -6,3 +6,10 @@ extern "C" {
         exit(EXIT_FAILURE);
     }
 }
+
+
+void SysTick_Handler(void)
+{
+  HAL_IncTick();
+  xPortSysTickHandler();
+}
