@@ -163,7 +163,10 @@ header file. */
 standard names. */
 #define vPortSVCHandler SVC_Handler
 #define xPortPendSVHandler PendSV_Handler
-#define xPortSysTickHandler SysTick_Handler
+
+/* xPortSysTickHandler if used with stm32cubef4 needs to be called from SysTick_Handler function */
+/* #define xPortSysTickHandler SysTick_Handler */
+
 
 #endif /* FREERTOS_CONFIG_H */
 
