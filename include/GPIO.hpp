@@ -113,6 +113,18 @@ namespace GPIO {
             ~GPIOPins();
             void turn_on();
             void turn_off();
+            GPIO_TypeDef* get_peripheral();
+            std::bitset<16> get_pins_bitmask();
     };
+
+    inline GPIO_TypeDef* GPIOPins::get_peripheral()
+    {
+        return peripheral;
+    }
+
+    inline std::bitset<16> GPIOPins::get_pins_bitmask()
+    {
+        return pins_bitmask;
+    }
 }
 #endif // GPIO_HPP
