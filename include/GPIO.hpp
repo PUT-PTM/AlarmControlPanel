@@ -113,16 +113,16 @@ namespace GPIO {
             ~GPIOPins();
             void turn_on();
             void turn_off();
-            GPIO_TypeDef* get_peripheral();
-            std::bitset<16> get_pins_bitmask();
+            GPIO_TypeDef* get_peripheral() const;
+            std::bitset<16> get_pins_bitmask() const;
     };
 
-    inline GPIO_TypeDef* GPIOPins::get_peripheral()
+    inline GPIO_TypeDef* GPIOPins::get_peripheral() const 
     {
         return peripheral;
     }
 
-    inline std::bitset<16> GPIOPins::get_pins_bitmask()
+    inline std::bitset<16> GPIOPins::get_pins_bitmask() const
     {
         return pins_bitmask;
     }
