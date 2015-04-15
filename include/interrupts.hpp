@@ -22,9 +22,9 @@ namespace Interrupts {
                                    IRQn_Type irqn_type, int32_t PreemptionPriority, uint32_t SubPriority);
             static void disable_int(GPIO_TypeDef *peripheral, std::initializer_list<GPIO::Pin> pins, IRQn_Type irqn_type);
 
-            static std::list<GPIO::GPIOPins *> interrupt_list;
+            static std::list<GPIO::GPIOPins> interrupt_list;
         private:
-            static std::list<GPIO::GPIOPins *>::iterator find_gpiopins(std::list<GPIO::GPIOPins *> gpiopins_list,
+            static std::list<GPIO::GPIOPins>::iterator find_gpiopins(std::list<GPIO::GPIOPins> &gpiopins_list,
                                                         GPIO_TypeDef *peripheral, std::bitset<16> pins_bitmask);
 
     };
