@@ -27,7 +27,6 @@ void vLedTask2(void *args)
 
 int main()
 {
-
     /* STM32F4xx HAL library initialization:
        - Configure the Flash prefetch, Flash preread and Buffer caches
        - Systick timer is configured by default as source of time base, but user
@@ -42,6 +41,9 @@ int main()
     /* Configure the system clock to 168 MHz */
     SystemClock_Config();
     
+    // Configure button interrupt
+    Interrupts::EXTIInt::enable_int(GPIOA, {GPIO::Pin::P0}, Interrupts::Mode::FallingEdgeInterrupt, EXTI0_IRQn, 2, 0);
+
     // Stack size 150 can be easly exceeded when extending tasks
     xTaskCreate(vLedTask1, "Leds1", 150, NULL, 3, NULL);
     xTaskCreate(vLedTask2, "Leds2", 150, NULL, 3, NULL);
