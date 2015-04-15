@@ -4,3 +4,6 @@
 [submodule "lib/FreeRTOS"]
 	path = lib/FreeRTOS
 	url = https://github.com/Plytirex/FreeRTOS.git
+[submodule "lib/STM32F4-HD44780"]
+	path = lib/STM32F4-HD44780
+	url = https://github.com/EarToEarOak/STM32F4-HD44780.git
