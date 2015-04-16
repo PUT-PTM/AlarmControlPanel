@@ -77,6 +77,15 @@ namespace GPIO {
     void GPIOPins::turn_off() {
         HAL_GPIO_WritePin(peripheral, pins_bitmask.to_ulong(), GPIO_PinState(GPIO_PIN_RESET));
     }
+
+    void GPIOPins::set_state(bool state) {
+        if(state) turn_on();
+        else turn_off();
+    }
+
+    bool GPIOPins::get_state() {
+        HAL_GPIO_ReadPin(peripheral, pins_bitmask.to_ulong());
+    }
     
     std::list<GPIO_TypeDef *> GPIOPins::initialized_peripherals = std::list<GPIO_TypeDef *>();
 }
