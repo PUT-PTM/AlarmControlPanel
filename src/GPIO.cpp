@@ -84,7 +84,7 @@ namespace GPIO {
     }
 
     bool GPIOPins::get_state() {
-        HAL_GPIO_ReadPin(peripheral, pins_bitmask.to_ulong());
+        return HAL_GPIO_ReadPin(peripheral, pins_bitmask.to_ulong());
     }
     
     std::list<GPIO_TypeDef *> GPIOPins::initialized_peripherals = std::list<GPIO_TypeDef *>();
