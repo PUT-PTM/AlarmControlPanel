@@ -31,9 +31,9 @@ int main()
 
     led.turn_on();
 
-    screen->WriteString("Ty chuju xD");
+    screen->WriteString("NAJLEPSZY EKRAN");
     screen->SetCursorPosition(1,0);
-    screen->WriteString("Wykurwiaj");
+    screen->WriteString("hehe smieszne");
 
     for(;;)
     {
