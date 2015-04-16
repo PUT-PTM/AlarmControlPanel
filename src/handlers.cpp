@@ -10,7 +10,7 @@ extern "C" {
     void SysTick_Handler(void)
     {
          HAL_IncTick();
-         xPortSysTickHandler();
+         //xPortSysTickHandler();
     }
 
      void EXTI0_IRQHandler(void)

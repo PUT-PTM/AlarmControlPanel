@@ -23,16 +23,17 @@ int main()
     // Configure button interrupt
     //Interrupts::EXTIInt::enable_int(GPIOA, {GPIO::Pin::P0}, Interrupts::Mode::FallingEdgeInterrupt, EXTI0_IRQn, 2, 0);
 
-    GPIO::GPIOPins testowy(GPIOD, {GPIO::Pin::P12}, GPIO::Mode::OutputPushPull, GPIO::Pull::NoPull, GPIO::Speed::Low);
-
-    testowy.turn_off();
+    GPIO::GPIOPins led(GPIOD, {GPIO::Pin::P12}, GPIO::Mode::OutputPushPull, GPIO::Pull::NoPull, GPIO::Speed::Low);
+    GPIO::GPIOPins testowy(GPIOA, {GPIO::Pin::P6}, GPIO::Mode::OutputPushPull, GPIO::Pull::NoPull, GPIO::Speed::Low);
 
     Peripheral::Screen * screen = new Peripheral::Screen;
     screen->Initialize();
-    screen->Write(0, 1);
-    uint8_t result = screen->Read(0);
 
-    testowy.turn_on();
+    led.turn_on();
+
+    screen->WriteString("Ty chuju xD");
+    screen->SetCursorPosition(1,0);
+    screen->WriteString("Wykurwiaj");
 
     for(;;)
     {
