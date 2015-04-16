@@ -1,4 +1,4 @@
-# HAL
+# AlarmControlPanel
 Project of Intruder Alarm Control Panel.  
 You can find used devices at [project's wiki page](https://github.com/Plytirex/AlarmControlPanel/wiki/Equipment)
 
