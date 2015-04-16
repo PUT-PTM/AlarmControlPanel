@@ -1,29 +1,8 @@
 #include "main.hpp"
 
-void vLedTask1(void *args)
-{
-    auto leds = Leds({OrangeLed, GreenLed});
-    for (int i = 0; i <= 1000000; i++);
-    while (7) {        
-        leds.turn_on();
-        for (int i = 0; i <= 1000000; i++);
-        leds.turn_off();
-        for (int i = 0; i <= 1000000; i++);
-//  manual interrupt (manual context switch)       taskYIELD();
-     }
-}
-
-void vLedTask2(void *args)
-{
-    auto leds = Leds({BlueLed, RedLed});
-    while (7) {
-        leds.turn_on();
-        for (int i = 0; i <= 1000000; i++);
-        leds.turn_off();
-        for (int i = 0; i <= 1000000; i++);
-//  manual interrupt (manual context switch)       taskYIELD();
-    }
-}
+#include "GPIO.hpp"
+#include "Leds.hpp"
+#include "Peripheral.hpp"
 
 int main()
 {
@@ -42,12 +21,23 @@ int main()
     SystemClock_Config();
     
     // Configure button interrupt
-    Interrupts::EXTIInt::enable_int(GPIOA, {GPIO::Pin::P0}, Interrupts::Mode::FallingEdgeInterrupt, EXTI0_IRQn, 2, 0);
+    //Interrupts::EXTIInt::enable_int(GPIOA, {GPIO::Pin::P0}, Interrupts::Mode::FallingEdgeInterrupt, EXTI0_IRQn, 2, 0);
 
-    // Stack size 150 can be easly exceeded when extending tasks
-    xTaskCreate(vLedTask1, "Leds1", 150, NULL, 3, NULL);
-    xTaskCreate(vLedTask2, "Leds2", 150, NULL, 3, NULL);
-    vTaskStartScheduler();
+    GPIO::GPIOPins testowy(GPIOD, {GPIO::Pin::P12}, GPIO::Mode::OutputPushPull, GPIO::Pull::NoPull, GPIO::Speed::Low);
+
+    testowy.turn_off();
+
+    Peripheral::Screen * screen = new Peripheral::Screen;
+    screen->Initialize();
+    screen->Write(0, 1);
+    uint8_t result = screen->Read(0);
+
+    testowy.turn_on();
+
+    for(;;)
+    {
+        
+    }
 
     return 0;
 }
