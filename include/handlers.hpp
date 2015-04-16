@@ -1,5 +1,7 @@
 #include <cstdlib>
 
+#include "interrupts.hpp"
+
 #include "stm32f4xx_hal.h"
 #include "debug.hpp"
 #include "FreeRTOS.h"
