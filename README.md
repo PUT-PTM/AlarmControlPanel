@@ -1,4 +1,4 @@
-# AlarmControlPanel
+# AlarmControlPanel [![Build Status](https://travis-ci.org/Plytirex/AlarmControlPanel.svg?branch=master)](https://travis-ci.org/Plytirex/AlarmControlPanel)
 Project of Intruder Alarm Control Panel.  
 You can find used devices at [project's wiki page](https://github.com/Plytirex/AlarmControlPanel/wiki/Equipment)
 
