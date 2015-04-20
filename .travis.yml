@@ -1,4 +1,5 @@
 language: cpp
+cache: ccache
 before_script:
   - sudo add-apt-repository ppa:terry.guo/gcc-arm-embedded -y
   - sudo apt-get update -qq
