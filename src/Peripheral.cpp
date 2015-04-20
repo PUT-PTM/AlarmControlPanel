@@ -20,13 +20,13 @@ namespace Peripheral
 
         /** Special initialization **/
 
-        this->WriteHalf(0, 0b00110000, false); // ????
+        this->WriteHalf(0, 0b00110000, false); // Function Set
         HAL_Delay(5);
 
-        this->WriteHalf(0, 0b00110000, false); // ????
+        this->WriteHalf(0, 0b00110000, false); // Function Set
         HAL_Delay(1);
 
-        this->WriteHalf(0, 0b00110000, false); // ????
+        this->WriteHalf(0, 0b00110000, false); // Function Set
         HAL_Delay(1);
 
         this->WriteHalf(0, 0b00100000, false); // Set 4 bit mode
