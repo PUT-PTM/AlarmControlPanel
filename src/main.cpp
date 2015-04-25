@@ -25,16 +25,30 @@ int main()
 
     std::string menu[5] = { "Pos 0", "Pos 1", "Pos 2", "Pos 3", "Pos 4" };
     interface.SetMenu(menu, 5);
-    interface.Redraw();
 
+    interface.SetInputComment("WPISZ COS XD");
+    interface.SetMode(Screen::Interface::Mode::Input);
     debug("Done.\n");
+
+    for(int i=0; i<5; i++)
+    {
+        interface.AppendCharToInput('b');
+        HAL_Delay(100);
+    }
+
+    debug("Input: %s\n", interface.GetInput().c_str());
+
+    HAL_Delay(1000);
+    interface.SetMode(Screen::Interface::Mode::Menu);
 
     while(true)
     {
-        debug("Loop\n");
-        HAL_Delay(100);
-        debug("    Loop\n");
-        HAL_Delay(100);
+        debug("MenuPos: %d\n", interface.GetSelectedIndex());
+        HAL_Delay(500);
+        interface.ScrollDown();
+        debug("MenuPos: %d\n", interface.GetSelectedIndex());
+        HAL_Delay(500);
+        interface.ScrollUp();
     }
 
     return 0;

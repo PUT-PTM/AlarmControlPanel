@@ -27,11 +27,15 @@ namespace Screen
 
         uint8_t Read(bool RS);
 	public:
-		void Init(GPIO::Pin RS = GPIO::Pin::P0, GPIO::Pin RW = GPIO::Pin::P2, GPIO::Pin E = GPIO::Pin::P4, GPIO::Pin D4 = GPIO::Pin::P1, GPIO::Pin D5 = GPIO::Pin::P3, GPIO::Pin D6 = GPIO::Pin::P5, GPIO::Pin D7 = GPIO::Pin::P7);
+		void Init(GPIO_TypeDef *peripheral = GPIOA, GPIO::Pin RS = GPIO::Pin::P0, GPIO::Pin RW = GPIO::Pin::P2, GPIO::Pin E = GPIO::Pin::P4, GPIO::Pin D4 = GPIO::Pin::P1, GPIO::Pin D5 = GPIO::Pin::P3, GPIO::Pin D6 = GPIO::Pin::P5, GPIO::Pin D7 = GPIO::Pin::P7);
         ~LCD();
 
         void WriteString(const char* string);
         void WriteChar(char character);
+
+        void WriteStringAt(const char* string, bool line, uint8_t pos);
+        void WriteCharAt(char character, bool line, uint8_t pos);
+
         void Clear();
         void Home();
         void SetDisplay(bool displayOn, bool cursorOn, bool cursorBlinkOn);
@@ -42,29 +46,51 @@ namespace Screen
 
     class Interface
     {
+    public:
+        enum Mode : uint8_t
+        {
+            Menu = 0,
+            Input = 1
+        };
+        
     private:
         const uint8_t _width = 16;
         const uint8_t _height = 2;
 
         LCD _screen;
+        Mode _mode = Mode::Menu;
 
         std::string * _menuArray;
         uint8_t _menuArrayLength;
 
         uint8_t _menuPosition = 0;
+        uint8_t _rowSelected = 0;
+
+        std::string _inputComment = "";
+        std::string _input = "";
+        
     public:
         Interface();
-        Interface(LCD screen);
+        Interface(LCD screen);        
 
         LCD* GetLCD();
 
         void SetMenu(std::string * menuArray, uint8_t length);
         void SetMenuPosition(uint8_t position);
+        void SetMode(Mode mode);
 
-        void Redraw();
+        uint8_t GetSelectedIndex();
+        Mode GetMode();
+
+        void Redraw(bool onlyArrows = false);
 
         void ScrollUp();
         void ScrollDown();
+
+        void SetInputComment(std::string comment);
+        void AppendCharToInput(char character);
+        void SetInput(std::string input);
+        std::string GetInput();
     };
 }
 
