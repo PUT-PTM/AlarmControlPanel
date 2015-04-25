@@ -1,4 +1,5 @@
 #include "handlers.hpp"
+#include "Leds.hpp"
 
 int button_click_counter = 0;
 
@@ -11,7 +12,7 @@ extern "C" {
     void SysTick_Handler(void)
     {
         HAL_IncTick();
-        xPortSysTickHandler();
+        //xPortSysTickHandler();
     }
 
     void EXTI0_IRQHandler(void)
@@ -27,12 +28,12 @@ extern "C" {
 
 void EXTI0_IRQHandlerCpp()
 {
+    static Leds diody({GreenLed});
     static uint32_t tickstart = 0;
+    static int click_counter = 0;
     if((HAL_GetTick() - tickstart) > 50) {
-        button_click_counter++;
-        if (button_click_counter >= 5) {
-            Interrupts::EXTIInt::disable_int(GPIOA, {GPIO::Pin::P0}, EXTI0_IRQn);
-        }
+        click_counter++;
+        diody.set_state(click_counter % 2 == 0);
         tickstart = HAL_GetTick();
     }
 }

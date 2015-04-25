@@ -8,5 +8,8 @@
 #include "FreeRTOS.h"
 #include "task.h"
 #include "handlers.hpp"
+#include "Peripheral.hpp"
+
+#include "Screen.hpp"
 
 #endif /* MAIN_H */
