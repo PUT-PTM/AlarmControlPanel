@@ -47,7 +47,7 @@ CFLAGS += $(DEFINES)
 
 # Cpp compiler's settings
 CPP=arm-none-eabi-g++
-CPPFLAGS := -Wall -std=c++11 -Os
+CPPFLAGS := -Wall -std=c++1y -Os
 CPPFLAGS += -mlittle-endian -mthumb -mcpu=cortex-m4 -mthumb-interwork
 CPPFLAGS += -mfpu=fpv4-sp-d16 -mfloat-abi=softfp
 CPPFLAGS += $(DEFINES)
