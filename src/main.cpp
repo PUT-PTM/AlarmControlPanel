@@ -23,8 +23,8 @@ int main()
 
     Screen::Interface interface;
 
-    std::string menu[5] = { "Pos 0", "Pos 1", "Pos 2", "Pos 3", "Pos 4" };
-    interface.SetMenu(menu, 5);
+    std::vector<std::string> menu = { "Pos 0", "Pos 1", "Pos 2", "Pos 3", "Pos 4" };
+    interface.SetMenu(menu);
 
     interface.SetInputComment("WPISZ COS XD");
     interface.SetMode(Screen::Interface::Mode::Input);
@@ -46,6 +46,12 @@ int main()
         debug("MenuPos: %d\n", interface.GetSelectedIndex());
         HAL_Delay(500);
         interface.ScrollDown();
+        debug("MenuPos: %d\n", interface.GetSelectedIndex());
+        HAL_Delay(500);
+        interface.ScrollDown();
+        debug("MenuPos: %d\n", interface.GetSelectedIndex());
+        HAL_Delay(500);
+        interface.ScrollUp();
         debug("MenuPos: %d\n", interface.GetSelectedIndex());
         HAL_Delay(500);
         interface.ScrollUp();

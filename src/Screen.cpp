@@ -4,18 +4,17 @@
 
 namespace Screen
 {
-    void LCD::Init(GPIO_TypeDef *peripheral, GPIO::Pin RS, GPIO::Pin RW, GPIO::Pin E, GPIO::Pin D4, GPIO::Pin D5, GPIO::Pin D6, GPIO::Pin D7)
+    LCD::LCD(GPIO_TypeDef *peripheral, GPIO::Pin RS, GPIO::Pin RW, GPIO::Pin E, GPIO::Pin D4, GPIO::Pin D5, GPIO::Pin D6, GPIO::Pin D7)
+    : _RS(peripheral, {RS}, GPIO::Mode::OutputPushPull, GPIO::Pull::NoPull, GPIO::Speed::Low),
+      _RW(peripheral, {RW}, GPIO::Mode::OutputPushPull, GPIO::Pull::NoPull, GPIO::Speed::Low),
+      _E(peripheral, {E},  GPIO::Mode::OutputPushPull, GPIO::Pull::NoPull, GPIO::Speed::Low),
+      _D4(peripheral, {D4}, GPIO::Mode::OutputPushPull, GPIO::Pull::NoPull, GPIO::Speed::Low),
+      _D5(peripheral, {D5}, GPIO::Mode::OutputPushPull, GPIO::Pull::NoPull, GPIO::Speed::Low),
+      _D6(peripheral, {D6}, GPIO::Mode::OutputPushPull, GPIO::Pull::NoPull, GPIO::Speed::Low),
+      _D7(peripheral, {D7}, GPIO::Mode::OutputPushPull, GPIO::Pull::NoPull, GPIO::Speed::Low)
 	{
 		// GPIO Pins Initialization
         debug("Screen - Begin GPIO init\n");
-
-        _RS = new GPIO::GPIOPins(peripheral, {RS}, GPIO::Mode::OutputPushPull, GPIO::Pull::NoPull, GPIO::Speed::Low);
-        _RW = new GPIO::GPIOPins(peripheral, {RW}, GPIO::Mode::OutputPushPull, GPIO::Pull::NoPull, GPIO::Speed::Low);
-        _E  = new GPIO::GPIOPins(peripheral, {E},  GPIO::Mode::OutputPushPull, GPIO::Pull::NoPull, GPIO::Speed::Low);
-        _D4 = new GPIO::GPIOPins(peripheral, {D4}, GPIO::Mode::OutputPushPull, GPIO::Pull::NoPull, GPIO::Speed::Low);
-        _D5 = new GPIO::GPIOPins(peripheral, {D5}, GPIO::Mode::OutputPushPull, GPIO::Pull::NoPull, GPIO::Speed::Low);
-        _D6 = new GPIO::GPIOPins(peripheral, {D6}, GPIO::Mode::OutputPushPull, GPIO::Pull::NoPull, GPIO::Speed::Low);
-        _D7 = new GPIO::GPIOPins(peripheral, {D7}, GPIO::Mode::OutputPushPull, GPIO::Pull::NoPull, GPIO::Speed::Low);
 
         debug("Screen - End GPIO init\n");
 
@@ -56,13 +55,6 @@ namespace Screen
 
     LCD::~LCD()
     {
-        delete _RS;
-        delete _RW;
-        delete _E;
-        delete _D4;
-        delete _D5;
-        delete _D6;
-        delete _D7;
     }
 
     void LCD::WaitForUnblock()
@@ -74,14 +66,14 @@ namespace Screen
     {
         WriteHalf(RS, data, checkForBlockFlag);
 
-        _E->set_state(true);
+        _E.set_state(true);
 
-        _D4->set_state(data & 0b00000001); //1
-        _D5->set_state(data & 0b00000010); //2
-        _D6->set_state(data & 0b00000100); //4
-        _D7->set_state(data & 0b00001000); //8
+        _D4.set_state(data & 0b00000001); //1
+        _D5.set_state(data & 0b00000010); //2
+        _D6.set_state(data & 0b00000100); //4
+        _D7.set_state(data & 0b00001000); //8
 
-        _E->set_state(false);
+        _E.set_state(false);
     }
 
     void LCD::WriteHalf(bool RS, uint8_t data, bool checkForBlockFlag)
@@ -89,24 +81,24 @@ namespace Screen
         if(checkForBlockFlag)
             WaitForUnblock();
 
-        _E->set_state(true);
+        _E.set_state(true);
 
-        _RS->set_state(RS);
-        _RW->set_state(false); //Write mode
+        _RS.set_state(RS);
+        _RW.set_state(false); //Write mode
 
-        _D4->set_state(data & 0b00010000); //16
-        _D5->set_state(data & 0b00100000); //32
-        _D6->set_state(data & 0b01000000); //64
-        _D7->set_state(data & 0b10000000); //128
+        _D4.set_state(data & 0b00010000); //16
+        _D5.set_state(data & 0b00100000); //32
+        _D6.set_state(data & 0b01000000); //64
+        _D7.set_state(data & 0b10000000); //128
 
-        _E->set_state(false);
+        _E.set_state(false);
     }
 
-    void LCD::WriteString(const char* string)
+    void LCD::WriteString(std::string str)
     {
-        for(int i=0; string[i] != '\0'; i++)
+        for (const char &chr : str)
         {
-            this->Write(1, string[i]);
+            this->Write(1, chr);
             HAL_Delay(1);
         }
     }
@@ -117,10 +109,10 @@ namespace Screen
         HAL_Delay(1);
     }
 
-    void LCD::WriteStringAt(const char* string, bool line, uint8_t pos)
+    void LCD::WriteStringAt(std::string str, bool line, uint8_t pos)
     {
         this->SetCursorPosition(line, pos);
-        this->WriteString(string);
+        this->WriteString(str);
     }
 
     void LCD::WriteCharAt(char character, bool line, uint8_t pos)
@@ -133,32 +125,32 @@ namespace Screen
     {
         uint8_t result = 0;
 
-        _RS->set_state(RS);
-        _RW->set_state(true); //Read mode
+        _RS.set_state(RS);
+        _RW.set_state(true); //Read mode
 
-        _D4->set_state(false);
-        _D5->set_state(false);
-        _D6->set_state(false);
-        _D7->set_state(false);
+        _D4.set_state(false);
+        _D5.set_state(false);
+        _D6.set_state(false);
+        _D7.set_state(false);
 
-        _E->set_state(false);
+        _E.set_state(false);
 
-        result |= (_D4->get_state() * 0b1000);
-        result |= (_D5->get_state() * 0b1000);
-        result |= (_D6->get_state() * 0b1000);
-        result |= (_D7->get_state() * 0b1000);
+        result |= (_D4.get_state() * 0b1000);
+        result |= (_D5.get_state() * 0b1000);
+        result |= (_D6.get_state() * 0b1000);
+        result |= (_D7.get_state() * 0b1000);
 
         // Wait ?
         HAL_Delay(1);
 
-        _E->set_state(true);
+        _E.set_state(true);
 
-        _E->set_state(false);
+        _E.set_state(false);
 
-        result |= _D4->get_state();
-        result |= _D5->get_state();
-        result |= _D6->get_state();
-        result |= _D7->get_state();
+        result |= _D4.get_state();
+        result |= _D5.get_state();
+        result |= _D6.get_state();
+        result |= _D7.get_state();
 
         return result;
     }
@@ -201,8 +193,8 @@ namespace Screen
     }
 
     Interface::Interface()
+    : _screen(GPIOE, GPIO::Pin::P8, GPIO::Pin::P10, GPIO::Pin::P12, GPIO::Pin::P7, GPIO::Pin::P9, GPIO::Pin::P11, GPIO::Pin::P13)
     {
-        _screen.Init(GPIOE, GPIO::Pin::P8, GPIO::Pin::P10, GPIO::Pin::P12, GPIO::Pin::P7, GPIO::Pin::P9, GPIO::Pin::P11, GPIO::Pin::P13);
     }
 
     Interface::Interface(LCD screen) : _screen(screen)
@@ -210,21 +202,15 @@ namespace Screen
 
     }
 
-    LCD* Interface::GetLCD()
+    LCD &Interface::GetLCD()
     {
-        return &_screen;
+        return _screen;
     }
 
-    void Interface::SetMenu(std::string * menuArray, uint8_t length)
+    void Interface::SetMenu(std::vector<std::string> menuArray)
     {
-        _menuArray = new std::string[length];
-        _menuArrayLength = length;
-
-        _rowSelected = 0;
-        _menuPosition = 0;
-
-        for(int i=0; i<length; i++)
-            _menuArray[i] = menuArray[i];
+        _menuArray = menuArray;
+        _menuArrayLength = menuArray.size();
 
         Redraw();
     }

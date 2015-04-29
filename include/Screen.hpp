@@ -1,6 +1,7 @@
 #ifndef SCREEN_HPP
 #define SCREEN_HPP
 
+#include <vector>
 #include "GPIO.hpp"
 #include "debug.hpp"
 
@@ -9,16 +10,14 @@ namespace Screen
     class LCD
     {
     private:
-        GPIO::GPIOPins * _RS;   // Registry Set ( 0 = Instruction Register (W) Busy Flag: address counter (R), 1 = Data Register (RW) )
-        GPIO::GPIOPins * _RW;   // Read/Write ( 0 = W, 1 = R)
-        GPIO::GPIOPins * _E;    // Clock, screen starts reading on falling edge
+        GPIO::GPIOPins _RS;   // Registry Set ( 0 = Instruction Register (W) Busy Flag: address counter (R), 1 = Data Register (RW) )
+        GPIO::GPIOPins _RW;   // Read/Write ( 0 = W, 1 = R)
+        GPIO::GPIOPins _E;    // Clock, screen starts reading on falling edge
 
-        GPIO::GPIOPins * _D4;
-        GPIO::GPIOPins * _D5;
-        GPIO::GPIOPins * _D6;
-        GPIO::GPIOPins * _D7;
-
-        uint8_t * _charList;
+        GPIO::GPIOPins _D4;
+        GPIO::GPIOPins _D5;
+        GPIO::GPIOPins _D6;
+        GPIO::GPIOPins _D7;
 
         void WaitForUnblock();
         
@@ -27,13 +26,13 @@ namespace Screen
 
         uint8_t Read(bool RS);
 	public:
-		void Init(GPIO_TypeDef *peripheral = GPIOA, GPIO::Pin RS = GPIO::Pin::P0, GPIO::Pin RW = GPIO::Pin::P2, GPIO::Pin E = GPIO::Pin::P4, GPIO::Pin D4 = GPIO::Pin::P1, GPIO::Pin D5 = GPIO::Pin::P3, GPIO::Pin D6 = GPIO::Pin::P5, GPIO::Pin D7 = GPIO::Pin::P7);
+		LCD(GPIO_TypeDef *peripheral = GPIOA, GPIO::Pin RS = GPIO::Pin::P0, GPIO::Pin RW = GPIO::Pin::P2, GPIO::Pin E = GPIO::Pin::P4, GPIO::Pin D4 = GPIO::Pin::P1, GPIO::Pin D5 = GPIO::Pin::P3, GPIO::Pin D6 = GPIO::Pin::P5, GPIO::Pin D7 = GPIO::Pin::P7);
         ~LCD();
 
-        void WriteString(const char* string);
+        void WriteString(std::string str);
         void WriteChar(char character);
 
-        void WriteStringAt(const char* string, bool line, uint8_t pos);
+        void WriteStringAt(std::string str, bool line, uint8_t pos);
         void WriteCharAt(char character, bool line, uint8_t pos);
 
         void Clear();
@@ -60,7 +59,7 @@ namespace Screen
         LCD _screen;
         Mode _mode = Mode::Menu;
 
-        std::string * _menuArray;
+        std::vector <std::string> _menuArray;
         uint8_t _menuArrayLength;
 
         uint8_t _menuPosition = 0;
@@ -73,9 +72,9 @@ namespace Screen
         Interface();
         Interface(LCD screen);        
 
-        LCD* GetLCD();
+        LCD &GetLCD();
 
-        void SetMenu(std::string * menuArray, uint8_t length);
+        void SetMenu(std::vector<std::string> menuArray);
         void SetMenuPosition(uint8_t position);
         void SetMode(Mode mode);
 
