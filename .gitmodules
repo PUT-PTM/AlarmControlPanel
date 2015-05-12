@@ -7,3 +7,6 @@
 [submodule "lib/STM32F4-HD44780"]
 	path = lib/STM32F4-HD44780
 	url = https://github.com/EarToEarOak/STM32F4-HD44780.git
+[submodule "lib/rapidjson"]
+	path = lib/rapidjson
+	url = https://github.com/miloyip/rapidjson.git

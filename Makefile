@@ -7,7 +7,7 @@ SRCS         := $(wildcard src/*.c) $(wildcard lib/FreeRTOS/*.c)
 SRCSCPP      := $(wildcard src/*.cpp)
 
 # headers' directories
-CINCS += -Iinclude -Ilib/stm32cubef4/include -Ilib/include/stm32cubef4/Legacy -Ilib/FreeRTOS/include
+CINCS += -Iinclude -Ilib/stm32cubef4/include -Ilib/include/stm32cubef4/Legacy -Ilib/FreeRTOS/include -Ilib/rapidjson/include/rapidjson
 
 ###
 # TODO: Probably we don't need this section
