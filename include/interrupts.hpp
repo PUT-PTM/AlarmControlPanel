@@ -7,7 +7,7 @@
 
 #include "stm32f4xx.h"
 #include "stm32f4xx_hal.h"
-#include "debug.hpp"
+#include "debug.h"
 
 namespace Interrupts {
     enum class Mode : uint32_t {

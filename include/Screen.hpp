@@ -3,7 +3,7 @@
 
 #include <vector>
 #include "GPIO.hpp"
-#include "debug.hpp"
+#include "debug.h"
 
 namespace Screen
 {

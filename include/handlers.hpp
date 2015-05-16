@@ -3,7 +3,7 @@
 #include "interrupts.hpp"
 
 #include "stm32f4xx_hal.h"
-#include "debug.hpp"
+#include "debug.h"
 #include "FreeRTOS.h"
 #include "task.h"
 

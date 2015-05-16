@@ -2,7 +2,7 @@
 #define MAIN_H
 
 #include "system_config.hpp"
-#include "debug.hpp"
+#include "debug.h"
 #include "Leds.hpp"
 #include "interrupts.hpp"
 #include "FreeRTOS.h"
