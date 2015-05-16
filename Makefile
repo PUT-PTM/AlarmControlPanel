@@ -7,15 +7,7 @@ SRCS         := $(wildcard src/*.c) $(wildcard lib/FreeRTOS/*.c)
 SRCSCPP      := $(wildcard src/*.cpp)
 
 # headers' directories
-CINCS += -Iinclude -Ilib/stm32cubef4/include -Ilib/include/stm32cubef4/Legacy -Ilib/FreeRTOS/include -Ilib/rapidjson/include/rapidjson
-
-###
-# TODO: Probably we don't need this section
-#
-# look for sources in given folders
-# VPATH := src lib
-###
-
+CINCS += -Iinclude -Ilib/stm32cubef4/include -Ilib/stm32cubef4/include/Legacy -Ilib/FreeRTOS/include -Ilib/rapidjson/include/rapidjson
 
 # build directory configuration
 BUILDDIR  := build
