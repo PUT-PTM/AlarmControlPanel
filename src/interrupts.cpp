@@ -4,7 +4,7 @@ namespace Interrupts {
     void EXTIInt::enable_int(GPIO_TypeDef *peripheral, std::initializer_list<GPIO::Pin> pins, Mode interrupt_mode,
             IRQn_Type irqn_type, int32_t PreemptionPriority, uint32_t SubPriority)
     {
-        interrupt_list.emplace_back(peripheral, pins, static_cast<GPIO::Mode>(interrupt_mode), GPIO::Pull::NoPull, GPIO::Speed::Low);
+        interrupt_list.emplace_back(peripheral, pins, static_cast<GPIO::Mode>(interrupt_mode), GPIO::Pull::PullDown, GPIO::Speed::Low);
         HAL_NVIC_SetPriority(irqn_type, PreemptionPriority, SubPriority);
         HAL_NVIC_EnableIRQ(irqn_type);
     }

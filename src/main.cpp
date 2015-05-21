@@ -1,5 +1,32 @@
 #include "main.hpp"
 
+void vDebugInterrupt(void *args)
+{
+    debug("Interrupt Debug: %s\n", (char*)args);
+    vTaskDelete(NULL);
+}
+
+void InterruptDebug(char *message)
+{
+    static char buffer[256];
+    sprintf(buffer, "%s", message);
+    xTaskCreate(vDebugInterrupt, "InterruptDebug", 3000, buffer, 3, NULL);
+}
+
+void* operator new  (std::size_t n)
+{
+    return pvPortMalloc(n);
+}
+void* operator new[](std::size_t n) {return pvPortMalloc(n);}
+void  operator delete  (void* p) {vPortFree(p);}
+void  operator delete[](void* p) {vPortFree(p);}
+
+PIR::PIRManager *pPirManager;
+Leds led1({GPIO::Pin::P11});
+Leds led2({GPIO::Pin::P13});
+Leds led3({GPIO::Pin::P14});
+Leds led4({GPIO::Pin::P15});
+
 int main()
 {
     /* STM32F4xx HAL library initialization:
@@ -13,48 +40,27 @@ int main()
      */
     HAL_Init();
 
+    HAL_NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_4);
+
     /* Configure the system clock to 168 MHz */
     SystemClock_Config();
 
-    debug("Initializing button interrupt\n");
-    Interrupts::EXTIInt::enable_int(GPIOA, {GPIO::Pin::P0}, Interrupts::Mode::FallingEdgeInterrupt, EXTI0_IRQn, 2, 0);
+    //debug("Initializing button interrupt\n");
+    //Interrupts::EXTIInt::enable_int(GPIOA, {GPIO::Pin::P0}, Interrupts::Mode::FallingEdgeInterrupt, EXTI0_IRQn, 2, 0);
+    //debug("Initializing PIR interrupt\n");
+    //Interrupts::EXTIInt::enable_int(GPIOC, {GPIO::Pin::P1}, Interrupts::Mode::RisingEdgeInterrupt, EXTI1_IRQn, 2, 0);
 
-    debug("Creating Interface object...\n");
+    //PIR::PIRManager pirManager;
+    //pPirManager = &pirManager;
+    pPirManager = new PIR::PIRManager();
+    debug("Starting task scheduler...\n");
+    vTaskStartScheduler();
 
-    Screen::Interface interface;
-
-    std::vector<std::string> menu = { "Pos 0", "Pos 1", "Pos 2", "Pos 3", "Pos 4" };
-    interface.SetMenu(menu);
-
-    interface.SetInputComment("WPISZ COS XD");
-    interface.SetMode(Screen::Interface::Mode::Input);
-    debug("Done.\n");
-
-    for(int i=0; i<5; i++)
-    {
-        interface.AppendCharToInput('b');
-        HAL_Delay(100);
-    }
-
-    debug("Input: %s\n", interface.GetInput().c_str());
-
-    HAL_Delay(1000);
-    interface.SetMode(Screen::Interface::Mode::Menu);
+    vPortFree(pPirManager);
 
     while(true)
     {
-        debug("MenuPos: %d\n", interface.GetSelectedIndex());
-        HAL_Delay(500);
-        interface.ScrollDown();
-        debug("MenuPos: %d\n", interface.GetSelectedIndex());
-        HAL_Delay(500);
-        interface.ScrollDown();
-        debug("MenuPos: %d\n", interface.GetSelectedIndex());
-        HAL_Delay(500);
-        interface.ScrollUp();
-        debug("MenuPos: %d\n", interface.GetSelectedIndex());
-        HAL_Delay(500);
-        interface.ScrollUp();
+        
     }
 
     return 0;

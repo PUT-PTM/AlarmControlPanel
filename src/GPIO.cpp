@@ -83,6 +83,10 @@ namespace GPIO {
         else turn_off();
     }
 
+    void GPIOPins::toggle_state() {
+        set_state(!get_state());
+    }
+
     bool GPIOPins::get_state() {
         return HAL_GPIO_ReadPin(peripheral, pins_bitmask.to_ulong());
     }

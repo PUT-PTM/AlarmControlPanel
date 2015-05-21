@@ -115,6 +115,7 @@ namespace GPIO {
             void turn_off();
             bool get_state();
             void set_state(bool state);
+            void toggle_state();
             GPIO_TypeDef* get_peripheral() const;
             std::bitset<16> get_pins_bitmask() const;
     };

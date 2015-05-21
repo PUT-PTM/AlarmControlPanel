@@ -16,4 +16,4 @@ extern "C" {
     [[ noreturn ]] void vApplicationStackOverflowHook(TaskHandle_t xTask, signed char *pcTaskName);
 }
 
-void EXTI0_IRQHandlerCpp();
+void EXTI1_IRQHandlerCpp();

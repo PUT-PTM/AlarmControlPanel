@@ -1,3 +1,5 @@
+#include "main.hpp"
+#include "GPIO.hpp"
 #include "handlers.hpp"
 #include "Leds.hpp"
 
@@ -12,21 +14,47 @@ extern "C" {
     void SysTick_Handler(void)
     {
         HAL_IncTick();
-        //xPortSysTickHandler();
+        xPortSysTickHandler();
     }
 
-    void EXTI0_IRQHandler(void)
+    void EXTI9_5_IRQHandler(void)
     {
-        HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_0);
+        HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_6);
+        HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_7);
+        HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_8);
+        HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_9);
+    }
+
+    void EXTI1_IRQHandler(void)
+    {
+        HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_1);
     }
 
     void HAL_GPIO_EXTI_Callback(uint16_t pin)
     {
-        EXTI0_IRQHandlerCpp();
+        switch(pin)
+        {
+            case GPIO_PIN_1:
+                EXTI1_IRQHandlerCpp();
+                break;
+            case GPIO_PIN_6:
+                pPirManager->InterruptHandler(1);
+                break;
+            case GPIO_PIN_7:
+                pPirManager->InterruptHandler(2);
+                break;
+            case GPIO_PIN_8:
+                pPirManager->InterruptHandler(3);
+                break;
+            case GPIO_PIN_9:
+                pPirManager->InterruptHandler(4);
+                break;
+        }
+
     }
 }
 
-void EXTI0_IRQHandlerCpp()
+void EXTI1_IRQHandlerCpp()
 {
     static Leds diody({GreenLed});
     static uint32_t tickstart = 0;
