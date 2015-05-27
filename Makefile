@@ -35,6 +35,7 @@ OBJCOPY=arm-none-eabi-objcopy
 CFLAGS := -Wall -std=c11 -Os
 CFLAGS += -mlittle-endian -mthumb -mcpu=cortex-m4 -mthumb-interwork
 CFLAGS += -mfpu=fpv4-sp-d16 -mfloat-abi=softfp
+CFLAGS += -fdata-sections -ffunction-sections
 CFLAGS += $(DEFINES)
 
 # Cpp compiler's settings
@@ -42,13 +43,14 @@ CPP=arm-none-eabi-g++
 CPPFLAGS := -Wall -std=c++1y -Os
 CPPFLAGS += -mlittle-endian -mthumb -mcpu=cortex-m4 -mthumb-interwork
 CPPFLAGS += -mfpu=fpv4-sp-d16 -mfloat-abi=softfp
+CPPFLAGS += -fdata-sections -ffunction-sections
 CPPFLAGS += $(DEFINES)
 
 # linker's scripts
 LDSRCS    := ldscripts/libs.ld ldscripts/mem.ld ldscripts/sections.ld
 
 # linker's settings
-LDFLAGS := $(LDSRCS:%=-T%) -specs nosys.specs --specs=rdimon.specs -lc -lrdimon
+LDFLAGS := $(LDSRCS:%=-T%) -specs nosys.specs --specs=rdimon.specs -lc -lrdimon -Wl,--gc-sections
 
 
 # advanced settings
