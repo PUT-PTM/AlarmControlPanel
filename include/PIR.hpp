@@ -1,10 +1,20 @@
 #ifndef PIR_HPP
 #define PIR_HPP
 
-#include "main.hpp"
+#include <vector>
+#include <string>
+
+#include "debug.h"
 
 namespace PIR
 {
+    struct Event {
+        std::string name;
+        std::string source;
+        std::string time;
+        uint16_t duration;
+    };
+
     class PIRSensor
     {
     public:
@@ -30,14 +40,14 @@ namespace PIR
         //PIRSensor _pir4;
 
     public:
+        static std::vector<Event> events_log;
+
         PIRManager();
 
         void InterruptHandler(int pirId);
         static void StartTimer(void *pPirSensor, uint32_t whatever);
         static void TimerHandler(TimerHandle_t xTimer);
-
     };
 }
-
 
 #endif // PIR_HPP

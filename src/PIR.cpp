@@ -11,7 +11,8 @@ namespace PIR
     {
         char timerName[16];
         sprintf(timerName, "pirTimer%d", ID);
-        Timer = xTimerCreate(timerName, sensitivity / portTICK_PERIOD_MS, pdFALSE, (void*)pirID, PIRManager::TimerHandler);
+        Timer = xTimerCreate(timerName, sensitivity / portTICK_PERIOD_MS, pdFALSE,
+                             (void*)pirID, PIRManager::TimerHandler);
 
         switch(Pin)
         {
@@ -54,7 +55,9 @@ namespace PIR
 
     void PIRSensor::InitInterrupt()
     {
-        Interrupts::EXTIInt::enable_int(GPIOPeripheral, {Pin}, Interrupts::Mode::RisingEdgeInterrupt, irqnType, 15, 15);
+        Interrupts::EXTIInt::enable_int(GPIOPeripheral, {Pin},
+                                        Interrupts::Mode::RisingEdgeInterrupt, irqnType,
+                                        15, 15);
     }
 
     bool PIRSensor::GPIOState()
@@ -108,31 +111,22 @@ namespace PIR
     void PIRManager::TimerHandler(TimerHandle_t xTimer)
     {
         led4.turn_off();
-        int timerId = (int)pvTimerGetTimerID(xTimer);
-        PIRSensor *pir = nullptr;
 
-        switch(timerId)
-        {
-            case 1:
-                pir = &pPirManager->_pir1;
-                break;
-            case 2:
-                pir = &pPirManager->_pir2;
-                break;
-            case 3:
-                pir = &pPirManager->_pir3;
-                break;
-            default:
-                return;
+        if(pPirManager->_pir1.GPIOState()) {
+            led1.toggle_state();
+            events_log.emplace_back(Event{"Movement detected", "Sensor 1", "12:00", 1});
         }
 
-        if(pPirManager->_pir1.GPIOState())
-            led1.toggle_state();
-
-        if(pPirManager->_pir2.GPIOState())
+        if(pPirManager->_pir2.GPIOState()) {
             led2.toggle_state();
+            events_log.emplace_back(Event{"Movement detected", "Sensor 2", "12:00", 1});
+        }
 
-        if(pPirManager->_pir3.GPIOState())
+        if(pPirManager->_pir3.GPIOState()) {
             led3.toggle_state();
+            events_log.emplace_back(Event{"Movement detected", "Sensor 3", "12:00", 1});
+        }
     }
+
+    std::vector<Event> PIRManager::events_log;
 }
