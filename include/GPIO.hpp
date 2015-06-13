@@ -105,7 +105,7 @@ namespace GPIO {
      */
     class GPIOPins {
         private:
-            static std::list<GPIO_TypeDef *> initialized_peripherals;
+            //static std::list<GPIO_TypeDef *> initialized_peripherals;
             GPIO_TypeDef *peripheral;
             std::bitset<16> pins_bitmask = std::bitset<16>();
         public:

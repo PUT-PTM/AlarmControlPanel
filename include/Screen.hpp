@@ -46,7 +46,7 @@ namespace Screen
     class Interface
     {
     public:
-        enum Mode : uint8_t
+        enum class Mode : uint8_t
         {
             Menu = 0,
             Input = 1
@@ -56,7 +56,7 @@ namespace Screen
         const uint8_t _width = 16;
         const uint8_t _height = 2;
 
-        LCD _screen;
+        LCD *_screen;
         Mode _mode = Mode::Menu;
 
         std::vector <std::string> _menuArray;
@@ -69,10 +69,9 @@ namespace Screen
         std::string _input = "";
         
     public:
-        Interface();
-        Interface(LCD screen);        
+        Interface(LCD *screen);        
 
-        LCD &GetLCD();
+        LCD *GetLCD();
 
         void SetMenu(std::vector<std::string> menuArray);
         void SetMenuPosition(uint8_t position);

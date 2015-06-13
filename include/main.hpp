@@ -11,6 +11,7 @@
 #include "Peripheral.hpp"
 #include "timers.h"
 #include "PIR.hpp"
+#include "Keyboard.hpp"
 
 #include "Screen.hpp"
 

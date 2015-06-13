@@ -1,31 +1,27 @@
 #include "main.hpp"
 
-void vDebugInterrupt(void *args)
-{
-    debug("Interrupt Debug: %s\n", (char*)args);
-    vTaskDelete(NULL);
-}
-
-void InterruptDebug(char *message)
-{
-    static char buffer[256];
-    sprintf(buffer, "%s", message);
-    xTaskCreate(vDebugInterrupt, "InterruptDebug", 3000, buffer, 3, NULL);
-}
-
-void* operator new  (std::size_t n)
-{
-    return pvPortMalloc(n);
-}
+void* operator new  (std::size_t n) {return pvPortMalloc(n);}
 void* operator new[](std::size_t n) {return pvPortMalloc(n);}
 void  operator delete  (void* p) {vPortFree(p);}
 void  operator delete[](void* p) {vPortFree(p);}
 
 PIR::PIRManager *pPirManager;
-Leds led1({GPIO::Pin::P11});
+Screen::LCD *lcd;
+Screen::Interface *interface;
+Leds led1({GPIO::Pin::P12});
 Leds led2({GPIO::Pin::P13});
 Leds led3({GPIO::Pin::P14});
 Leds led4({GPIO::Pin::P15});
+
+void vInitializeScreen(void *args)
+{
+    lcd = new Screen::LCD(GPIOE, GPIO::Pin::P5, GPIO::Pin::P3, GPIO::Pin::P1, GPIO::Pin::P6, GPIO::Pin::P4, GPIO::Pin::P2, GPIO::Pin::P0);
+    interface = new Screen::Interface(lcd);
+
+    lcd->WriteString("Ready!");
+
+    vTaskDelete(NULL);
+}
 
 int main()
 {
@@ -39,28 +35,21 @@ int main()
        - Low Level Initialization
      */
     HAL_Init();
-
     HAL_NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_4);
 
     /* Configure the system clock to 168 MHz */
     SystemClock_Config();
 
-    //debug("Initializing button interrupt\n");
-    //Interrupts::EXTIInt::enable_int(GPIOA, {GPIO::Pin::P0}, Interrupts::Mode::FallingEdgeInterrupt, EXTI0_IRQn, 2, 0);
-    //debug("Initializing PIR interrupt\n");
-    //Interrupts::EXTIInt::enable_int(GPIOC, {GPIO::Pin::P1}, Interrupts::Mode::RisingEdgeInterrupt, EXTI1_IRQn, 2, 0);
+    //Peripheral::Keyboard::keyboard = new Peripheral::Keyboard(GPIOE, GPIO::Pin::P7, GPIO::Pin::P8, GPIO::Pin::P9, GPIO::Pin::P10, GPIO::Pin::P11, GPIO::Pin::P12, GPIO::Pin::P13, GPIO::Pin::P14);
 
-    //PIR::PIRManager pirManager;
-    //pPirManager = &pirManager;
-    pPirManager = new PIR::PIRManager();
     debug("Starting task scheduler...\n");
+    xTaskCreate(Peripheral::Keyboard::KeyboardCheckTask, "lksajd", 3000, NULL, 4, NULL);
+    xTaskCreate(vInitializeScreen, "ScreenInit", 3000, NULL, 4, NULL);
     vTaskStartScheduler();
-
-    vPortFree(pPirManager);
 
     while(true)
     {
-        
+
     }
 
     return 0;

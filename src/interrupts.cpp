@@ -16,6 +16,9 @@ namespace Interrupts {
             pins_bitmask |= std::bitset<16>(static_cast<uint16_t>(pin));
         }
 
+        HAL_NVIC_DisableIRQ(irqn_type);
+        
+        /*
         auto list_iter = find_gpiopins(interrupt_list, peripheral, pins_bitmask);
         if (list_iter == interrupt_list.end()) {
             debug("Interrupt GPIO: %x , pins_bitmask: %x hasn't been found.\n",
@@ -23,9 +26,9 @@ namespace Interrupts {
                     static_cast<unsigned int>(pins_bitmask.to_ulong()));
             return;
         } else {
-             HAL_NVIC_DisableIRQ(irqn_type);
              interrupt_list.erase(list_iter);
         }
+         */
     }
 
     std::list<GPIO::GPIOPins>::iterator EXTIInt::find_gpiopins(std::list<GPIO::GPIOPins> &gpiopins_list,
@@ -43,6 +46,32 @@ namespace Interrupts {
         }
         return return_list_iter;
     }
+
+    IRQn_Type EXTIInt::get_irqn_type(GPIO::Pin pin)
+    {
+        switch(pin)
+        {
+            case GPIO::Pin::P0: return EXTI0_IRQn;
+            case GPIO::Pin::P1: return EXTI1_IRQn;
+            case GPIO::Pin::P2: return EXTI2_IRQn;
+            case GPIO::Pin::P3: return EXTI3_IRQn;
+            case GPIO::Pin::P4: return EXTI4_IRQn;
+
+            case GPIO::Pin::P5:
+            case GPIO::Pin::P6:
+            case GPIO::Pin::P7:
+            case GPIO::Pin::P8:
+            case GPIO::Pin::P9: return EXTI9_5_IRQn;
+
+            case GPIO::Pin::P10:
+            case GPIO::Pin::P11:
+            case GPIO::Pin::P12:
+            case GPIO::Pin::P13:
+            case GPIO::Pin::P14:
+            case GPIO::Pin::P15: return EXTI15_10_IRQn;
+        }
+    }
+
     std::list<GPIO::GPIOPins> EXTIInt::interrupt_list;
 }
 

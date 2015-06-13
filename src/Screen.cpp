@@ -192,17 +192,12 @@ namespace Screen
         this->Write(0, 0b10000000 + (line * 0b1000000) + pos);
     }
 
-    Interface::Interface()
-    : _screen(GPIOE, GPIO::Pin::P8, GPIO::Pin::P10, GPIO::Pin::P12, GPIO::Pin::P7, GPIO::Pin::P9, GPIO::Pin::P11, GPIO::Pin::P13)
-    {
-    }
-
-    Interface::Interface(LCD screen) : _screen(screen)
+    Interface::Interface(LCD *screen) : _screen(screen)
     {
 
     }
 
-    LCD &Interface::GetLCD()
+    LCD *Interface::GetLCD()
     {
         return _screen;
     }
@@ -229,10 +224,10 @@ namespace Screen
         switch(_mode)
         {
             case Mode::Menu:
-                _screen.SetDisplay(1,0,0);
+                _screen->SetDisplay(1,0,0);
                 break;
             case Mode::Input:
-                _screen.SetDisplay(1,1,1);
+                _screen->SetDisplay(1,1,1);
                 break;
         }
     }
@@ -284,22 +279,22 @@ namespace Screen
         {
             if(!onlyArrows)
             {
-                _screen.Clear();
+                _screen->Clear();
 
-                _screen.WriteStringAt(_menuArray[_menuPosition].c_str(), 0, 2);
-                _screen.WriteStringAt(_menuArray[(_menuPosition == _menuArrayLength-1 ? 0 : _menuPosition + 1)].c_str(), 1, 2);
+                _screen->WriteStringAt(_menuArray[_menuPosition].c_str(), 0, 2);
+                _screen->WriteStringAt(_menuArray[(_menuPosition == _menuArrayLength-1 ? 0 : _menuPosition + 1)].c_str(), 1, 2);
             }
 
-            _screen.WriteCharAt(' ', !_rowSelected, 0);
-            _screen.WriteCharAt('>', _rowSelected, 0);
+            _screen->WriteCharAt(' ', !_rowSelected, 0);
+            _screen->WriteCharAt('>', _rowSelected, 0);
         }
         else
         {
-            _screen.Clear();
+            _screen->Clear();
 
-            _screen.WriteStringAt(_inputComment.c_str(), 0, 0);
-            _screen.WriteStringAt(_input.c_str(), 1, 0);
-            _screen.SetCursorPosition(1, _input.length());
+            _screen->WriteStringAt(_inputComment.c_str(), 0, 0);
+            _screen->WriteStringAt(_input.c_str(), 1, 0);
+            _screen->SetCursorPosition(1, _input.length());
         }
     }
 
@@ -315,7 +310,7 @@ namespace Screen
 
     void Interface::AppendCharToInput(char character)
     {
-        _screen.WriteCharAt(character, 1, _input.length());
+        _screen->WriteCharAt(character, 1, _input.length());
         _input = _input + character;
     }
 }
