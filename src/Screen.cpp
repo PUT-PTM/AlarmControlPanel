@@ -193,9 +193,57 @@ namespace Screen
         this->Write(0, 0b10000000 + (line * 0b1000000) + pos);
     }
 
+    MenuElement::MenuElement()
+    :   type(Type::None), name(""), displayString("") {}
+
+    MenuElement::MenuElement(Type type, std::string name, std::string displayString)
+    :   type(type), name(name), displayString(displayString)
+    {
+        if(displayString.length() > maxDisplayString)
+            displayString = displayString.substr(maxDisplayString);
+    }
+
+    MenuElement::MenuElement(Type type, std::string name, std::string displayString, bool *boolSetting)
+    :   type(type), name(name), displayString(displayString), boolSetting(boolSetting)
+    {
+        if(displayString.length() > maxDisplayString - 2)
+            displayString = displayString.substr(maxDisplayString);
+    }
+
+    MenuElement::MenuElement(Type type, std::string name, std::string displayString, Menu *childMenu)
+    :   type(type), name(name), displayString(displayString), childMenu(childMenu)
+    {
+        if(displayString.length() > maxDisplayString)
+            displayString = displayString.substr(maxDisplayString);
+    }
+
+    Menu::Menu()
+    :   menuName(""), parentMenu(0) {}
+
+    Menu::Menu(std::string menuName, std::vector <MenuElement> positions)
+    :   menuName(menuName), positions(positions), parentMenu(0) {}
+
+    Menu::Menu(std::string menuName, std::vector <MenuElement> positions, Menu *parentMenu)
+    :   menuName(menuName), positions(positions), parentMenu(parentMenu) {}
+
     Interface::Interface(LCD *screen) : _screen(screen)
     {
-        _interrupt = false;
+        Redraw();
+    }
+
+    std::string Interface::GetMenuFirstRow()
+    {
+        if(_currentMenu->positions.size() == 0) return "";
+        return _currentMenu->positions[_menuPosition].displayString;
+    }
+
+    std::string Interface::GetMenuSecondRow()
+    {
+        if(_currentMenu->positions.size() < 2) return "";
+
+        if(_menuPosition == _currentMenu->positions.size() - 1)
+            return _currentMenu->positions[0].displayString;
+        else return _currentMenu->positions[_menuPosition+1].displayString;
     }
 
     LCD *Interface::GetLCD()
@@ -203,22 +251,34 @@ namespace Screen
         return _screen;
     }
 
-    void Interface::SetMenu(std::vector<std::string> menuArray)
+    void Interface::SetMenu(Menu *menu)
     {
-        _menuArray = menuArray;
-        _menuArrayLength = menuArray.size();
+        _currentMenu = menu;
 
-        Redraw();
+        debug("Menu set.\n");
+        if(_mode == Mode::Menu) Redraw();
+    }
+
+    void Interface::SetMenu(Menu *menu, uint8_t menuPosition, uint8_t rowSelected)
+    {
+        _currentMenu = menu;
+
+        debug("Menu set.\n");
+        _menuPosition = menuPosition;
+        _rowSelected = rowSelected;
+        if(_mode == Mode::Menu) Redraw();
     }
 
     void Interface::SetMenuPosition(uint8_t position)
     {
         _menuPosition = position;
+        Redraw();
     }
 
     void Interface::SetMode(Mode mode)
     {
         if(_mode == mode) return;
+        if(mode == Mode::Menu && _currentMenu == 0) return;
 
         _mode = mode;
         Redraw();
@@ -237,7 +297,7 @@ namespace Screen
     uint8_t Interface::GetSelectedIndex()
     {
         //debug("MenuPos: %d, MenuArrayLength: %d, RowSelected: %d\n", _menuPosition, _menuArrayLength, _rowSelected);
-        return _menuPosition + _rowSelected == _menuArrayLength ? 0 : _menuPosition + _rowSelected;
+        return _menuPosition + _rowSelected == _currentMenu->positions.size() ? 0 : _menuPosition + _rowSelected;
     }
 
     Interface::Mode Interface::GetMode()
@@ -245,64 +305,145 @@ namespace Screen
         return _mode;
     }
 
+    MenuElement *Interface::GetSelectedElement()
+    {
+        if(_menuPosition + _rowSelected == _currentMenu->positions.size())
+            return &_currentMenu->positions[0];
+        else
+            return &_currentMenu->positions[_menuPosition + _rowSelected];
+    }
+
     void Interface::ScrollUp()
     {
-        if(_mode != Mode::Menu) return;
-        if(_rowSelected == 0)
+        if(_currentMenu->positions.size() < 2) return;
+        
+        switch(_rowSelected)
         {
-            _menuPosition = _menuPosition == 0 ? _menuArrayLength-1 : _menuPosition - 1;
-            Redraw();
-        }
-        else
-        {
-            _rowSelected = 0;
-            Redraw(true);
+            case 0:
+                if(_menuPosition == 0)
+                    _menuPosition = _currentMenu->positions.size() - 1;
+                else
+                    _menuPosition--;
+                Redraw();
+                break;
+            case 1:
+                _rowSelected--;
+                Redraw(true);
+                break;
         }
     }
 
     void Interface::ScrollDown()
     {
-        if(_mode != Mode::Menu) return;
-        if(_rowSelected == 1)
+        if(_currentMenu->positions.size() < 2) return;
+
+        switch(_rowSelected)
         {
-            _menuPosition = _menuPosition < _menuArrayLength-1 ? _menuPosition + 1 : 0;
-            Redraw();
+            case 0:
+                _rowSelected++;
+                Redraw(true);
+                break;
+            case 1:
+                if(_menuPosition == _currentMenu->positions.size() - 1)
+                    _menuPosition = 0;
+                else
+                    _menuPosition++;
+                Redraw();
+                break;
         }
-        else
-        {
-            _rowSelected = 1;
-            Redraw(true);
-        }
+    }
+
+    bool Interface::IsMenuRoot()
+    {
+        if(_currentMenu->parentMenu == 0) return true;
+        else return false;
+    }
+
+    void Interface::MoveUp()
+    {
+        if(_currentMenu->parentMenu == 0) return;
+        SetMenu(_currentMenu->parentMenu, _currentMenu->parentPosition, _currentMenu->parentRowSelected);
+    }
+
+    void Interface::MoveDown()
+    {
+        MenuElement * selectedElem = GetSelectedElement();
+        if(selectedElem->childMenu == 0) return;
+
+        selectedElem->childMenu->parentPosition = _menuPosition;
+        selectedElem->childMenu->parentRowSelected = _rowSelected;
+
+        SetMenu(selectedElem->childMenu, 0, 0);
+    }
+
+    void Interface::SetIdleMessage(std::string message)
+    {
+        _idleMessage = message;
+        if(_mode == Mode::Idle) Redraw();
     }
 
     void Interface::Redraw(bool onlyArrows)
     {
-        if(_mode == Mode::Menu)
+        switch(_mode)
         {
-            if(!onlyArrows)
-            {
+            case Mode::Idle:
                 _screen->Clear();
+                _screen->WriteStringAt(_idleMessage, 0, 0);
+                break;
+            case Mode::Input:
+                _screen->Clear();
+                _screen->WriteStringAt(_inputComment, 0, 0);
+                _screen->WriteStringAt(_input, 1, 0);
+                break;
+            case Mode::Menu:
+            {
+                if(!onlyArrows)
+                {
+                    _screen->Clear();
+                    _screen->WriteStringAt(GetMenuFirstRow(), 0, 1);
+                    _screen->WriteStringAt(GetMenuSecondRow(), 1, 1);
+                }
 
-                _screen->WriteStringAt(_menuArray[_menuPosition].c_str(), 0, 2);
-                _screen->WriteStringAt(_menuArray[(_menuPosition == _menuArrayLength-1 ? 0 : _menuPosition + 1)].c_str(), 1, 2);
+                _screen->WriteCharAt('>', _rowSelected, 0);
+                _screen->WriteCharAt(' ', !_rowSelected, 0);
+
+                DrawBoolValues();
             }
-
-            _screen->WriteCharAt(' ', !_rowSelected, 0);
-            _screen->WriteCharAt('>', _rowSelected, 0);
         }
-        else
+    }
+
+    void Interface::DrawBoolValues()
+    {
+        if(_mode != Mode::Menu) return;
+
+        if(_currentMenu->positions.size() < 1) return;
+
+        if(_currentMenu->positions[_menuPosition].type == MenuElement::Type::BoolSetting)
         {
-            _screen->Clear();
-
-            _screen->WriteStringAt(_inputComment.c_str(), 0, 0);
-            _screen->WriteStringAt(_input.c_str(), 1, 0);
-            _screen->SetCursorPosition(1, _input.length());
+            bool value1 = *_currentMenu->positions[_menuPosition].boolSetting;
+            _screen->WriteCharAt(value1 ? 'T' : 'F', 0, 15);
         }
+
+        if(_currentMenu->positions.size() < 2) return;
+
+        bool value2;
+        if(_menuPosition == _currentMenu->positions.size() - 1)
+            if(_currentMenu->positions[0].type == MenuElement::Type::BoolSetting)
+                value2 = *_currentMenu->positions[0].boolSetting;
+            else return;
+        else if(_currentMenu->positions[_menuPosition+1].type == MenuElement::Type::BoolSetting)
+        {
+            value2 = *_currentMenu->positions[_menuPosition+1].boolSetting;
+        }
+        else return;
+        
+        _screen->WriteCharAt(value2 ? 'T' : 'F', 1, 15);
     }
 
     void Interface::SetInputComment(std::string comment)
     {
         _inputComment = comment;
+        if(_mode == Mode::Input) Redraw();
     }
 
     std::string Interface::GetInput()
@@ -371,12 +512,6 @@ namespace Screen
             default:
                 return;
         }
-    }
-
-    void Interface::Interrupt(Peripheral::Keyboard::Button button)
-    {
-        _interruptButton = button;
-        _interrupt = true;
     }
 }
 

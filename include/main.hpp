@@ -14,6 +14,7 @@
 #include "PIR.hpp"
 #include "Keyboard.hpp"
 #include "Screen.hpp"
+#include "Menus.hpp"
 #include "ControlPanel.hpp"
 #include "handlers.hpp"
 

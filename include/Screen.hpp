@@ -42,43 +42,48 @@ namespace Screen
         void SetCursorPosition(bool line, uint8_t pos);
 	};
 
+    struct Menu;
+
     struct MenuElement
     {
         enum class Type : uint8_t
         {
             None,
+            Text,
             BoolSetting,
             InputSetting,
             Catalog
         };
 
-        const uint8_t maxDisplayString = 10;
+        static const uint8_t maxDisplayString = 15;
 
         std::string name;
         std::string displayString;
         Type type;
 
-        bool *changedSetting;
+        bool *boolSetting = 0;
+        
+        Menu *childMenu = 0;
 
-        MenuElement(Type type, std::string name, std::string displayString)
-        :   type(type), name(name), displayString(displayString)
-        {
-            if(displayString.length() > maxDisplayString)
-                displayString = displayString.substr(maxDisplayString);
-        }
-
-        MenuElement(Type type, std::string name, std::string displayString, bool *boolSetting)
-        :   type(type), name(name), displayString(displayString), changedSetting(boolSetting)
-        {
-            if(displayString.length() > maxDisplayString)
-                displayString = displayString.substr(maxDisplayString);
-        }
+        MenuElement();
+        MenuElement(Type type, std::string name, std::string displayString);
+        MenuElement(Type type, std::string name, std::string displayString, bool *boolSetting);
+        MenuElement(Type type, std::string name, std::string displayString, Menu *childMenu);
     };
 
     struct Menu
     {
         std::string menuName;
         std::vector <MenuElement> positions;
+
+        Menu *parentMenu = 0;
+
+        uint8_t parentPosition = -1;
+        uint8_t parentRowSelected = -1;
+
+        Menu();
+        Menu(std::string menuName, std::vector <MenuElement> positions);
+        Menu(std::string menuName, std::vector <MenuElement> positions, Menu *parentMenu);
     };
 
     class Interface
@@ -98,41 +103,49 @@ namespace Screen
         LCD *_screen;
         Mode _mode = Mode::Idle;
 
-        std::vector <std::string> _menuArray;
-        uint8_t _menuArrayLength;
+        Menu *_currentMenu;
 
         uint8_t _menuPosition = 0;
         uint8_t _rowSelected = 0;
 
+        std::string _idleMessage = "SUPER CENTRALEX";
+
         std::string _inputComment = "";
         std::string _input = "";
 
-        volatile bool _interrupt = false;
-        volatile Peripheral::Keyboard::Button _interruptButton = Peripheral::Keyboard::Button::None;
+        std::string GetMenuFirstRow();
+        std::string GetMenuSecondRow();
         
     public:
         Interface(LCD *screen);        
 
         LCD *GetLCD();
 
-        void SetMenu(std::vector<std::string> menuArray);
-        void SetMenu(Menu menu);
+        void SetMenu(Menu *menu);
+        void SetMenu(Menu *menu, uint8_t menuPosition, uint8_t rowSelected);
         void SetMenuPosition(uint8_t position);
         void SetMode(Mode mode);
 
         uint8_t GetSelectedIndex();
         Mode GetMode();
+        MenuElement *GetSelectedElement();
 
         void Redraw(bool onlyArrows = false);
+        void DrawBoolValues();
 
         void ScrollUp();
         void ScrollDown();
+        bool IsMenuRoot();
+        
+        void MoveUp();
+        void MoveDown();
+
+        void SetIdleMessage(std::string message);
 
         void SetInputComment(std::string comment);
         void AppendCharToInput(char character);
         void AppendCharToInput(Peripheral::Keyboard::Button button);
         void SetInput(std::string input);
-        void Interrupt(Peripheral::Keyboard::Button button);
         
         std::string GetInput();
     };
