@@ -1,4 +1,5 @@
 #include "Screen.hpp"
+#include "main.hpp"
 
 #include <string>
 
@@ -194,7 +195,7 @@ namespace Screen
 
     Interface::Interface(LCD *screen) : _screen(screen)
     {
-
+        _interrupt = false;
     }
 
     LCD *Interface::GetLCD()
@@ -313,5 +314,82 @@ namespace Screen
         _screen->WriteCharAt(character, 1, _input.length());
         _input = _input + character;
     }
+
+    void Interface::AppendCharToInput(Peripheral::Keyboard::Button button)
+    {
+        switch(button)
+        {
+            case Peripheral::Keyboard::Button::B0:
+                AppendCharToInput('0');
+                break;
+            case Peripheral::Keyboard::Button::B1:
+                AppendCharToInput('1');
+                break;
+            case Peripheral::Keyboard::Button::B2:
+                AppendCharToInput('2');
+                break;
+            case Peripheral::Keyboard::Button::B3:
+                AppendCharToInput('3');
+                break;
+            case Peripheral::Keyboard::Button::B4:
+                AppendCharToInput('4');
+                break;
+            case Peripheral::Keyboard::Button::B5:
+                AppendCharToInput('5');
+                break;
+            case Peripheral::Keyboard::Button::B6:
+                AppendCharToInput('6');
+                break;
+            case Peripheral::Keyboard::Button::B7:
+                AppendCharToInput('7');
+                break;
+            case Peripheral::Keyboard::Button::B8:
+                AppendCharToInput('8');
+                break;
+            case Peripheral::Keyboard::Button::B9:
+                AppendCharToInput('9');
+                break;
+            case Peripheral::Keyboard::Button::BAsterisk:
+                AppendCharToInput('*');
+                break;
+            case Peripheral::Keyboard::Button::BHash:
+                AppendCharToInput('#');
+                break;
+            case Peripheral::Keyboard::Button::BA:
+                AppendCharToInput('A');
+                break;
+            case Peripheral::Keyboard::Button::BB:
+                AppendCharToInput('B');
+                break;
+            case Peripheral::Keyboard::Button::BC:
+                AppendCharToInput('C');
+                break;
+            case Peripheral::Keyboard::Button::BD:
+                AppendCharToInput('D');
+                break;
+            default:
+                return;
+        }
+    }
+
+    void Interface::Interrupt(Peripheral::Keyboard::Button button)
+    {
+        _interruptButton = button;
+        _interrupt = true;
+    }
+
+    void Interface::CheckForInterruptTask(void *args)
+    {
+        while(true)
+        {
+            while(Interface::interface == 0 || !Interface::interface->_interrupt) {}
+            debug("Interrupt is true.\n");
+
+            Interface::interface->AppendCharToInput(Interface::interface->_interruptButton);
+            Interface::interface->_interrupt = false;
+        }
+    }
+
+    Interface *Interface::interface = 0;
 }
 

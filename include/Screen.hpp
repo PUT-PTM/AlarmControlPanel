@@ -1,9 +1,8 @@
 #ifndef SCREEN_HPP
 #define SCREEN_HPP
 
-#include <vector>
 #include "GPIO.hpp"
-#include "debug.h"
+#include "Keyboard.hpp"
 
 namespace Screen
 {
@@ -67,8 +66,13 @@ namespace Screen
 
         std::string _inputComment = "";
         std::string _input = "";
+
+        volatile bool _interrupt = false;
+        volatile Peripheral::Keyboard::Button _interruptButton = Peripheral::Keyboard::Button::None;
         
     public:
+        static Interface* interface;
+
         Interface(LCD *screen);        
 
         LCD *GetLCD();
@@ -87,7 +91,12 @@ namespace Screen
 
         void SetInputComment(std::string comment);
         void AppendCharToInput(char character);
+        void AppendCharToInput(Peripheral::Keyboard::Button button);
         void SetInput(std::string input);
+        void Interrupt(Peripheral::Keyboard::Button button);
+
+        static void CheckForInterruptTask(void *args);
+        
         std::string GetInput();
     };
 }

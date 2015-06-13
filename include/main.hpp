@@ -1,6 +1,8 @@
 #ifndef MAIN_H
 #define MAIN_H
 
+#include <functional>
+
 #include "system_config.hpp"
 #include "debug.h"
 #include "Leds.hpp"
@@ -12,10 +14,12 @@
 #include "timers.h"
 #include "PIR.hpp"
 #include "Keyboard.hpp"
-
 #include "Screen.hpp"
+//#include "ControlPanel.hpp"
 
+extern Screen::Interface *interface;
 extern PIR::PIRManager *pPirManager;
+
 extern Leds led1;
 extern Leds led2;
 extern Leds led3;

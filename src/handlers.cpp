@@ -25,6 +25,16 @@ extern "C" {
         HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_9);
     }
 
+    void EXTI15_10_IRQHandler(void)
+    {
+        HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_10);
+        HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_11);
+        HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_12);
+        HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_13);
+        HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_14);
+        HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_15);
+    }
+
     void EXTI1_IRQHandler(void)
     {
         HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_1);
@@ -32,6 +42,16 @@ extern "C" {
 
     void HAL_GPIO_EXTI_Callback(uint16_t pin)
     {
+        GPIO::Pin gpiopin = static_cast<GPIO::Pin>(pin);
+        if( gpiopin == Peripheral::Keyboard::keyboard->GetRowPin(0) ||
+            gpiopin == Peripheral::Keyboard::keyboard->GetRowPin(1) ||
+            gpiopin == Peripheral::Keyboard::keyboard->GetRowPin(2) ||
+            gpiopin == Peripheral::Keyboard::keyboard->GetRowPin(3))
+        {
+            Peripheral::Keyboard::keyboard->InterruptHandler(gpiopin);
+            return;
+        }
+
         switch(pin)
         {
             case GPIO_PIN_1:

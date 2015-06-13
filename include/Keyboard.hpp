@@ -1,12 +1,35 @@
 #ifndef KEYBOARD_HPP
 #define KEYBOARD_HPP
 
-#include "main.hpp"
+#include "GPIO.hpp"
 
 namespace Peripheral
 {
     class Keyboard
     {
+    public:
+        enum class Button : uint8_t
+        {
+            B0,
+            B1,
+            B2,
+            B3,
+            B4,
+            B5,
+            B6,
+            B7,
+            B8,
+            B9,
+            BAsterisk,
+            BHash,
+            BA,
+            BB,
+            BC,
+            BD,
+            None
+        };
+
+    private:
         GPIO_TypeDef *_peripheral;
         
         GPIO::Pin _R0Pin;
@@ -33,15 +56,10 @@ namespace Peripheral
         volatile int _lastPressTick = 0;
 
         void EnableInterrupt();
-        void DisableInterrupt();
-        
-        void SetRowState(bool state);
         void SetColumnState(bool state);
 
-        void SetRowMode(GPIO::Mode mode);
-        void SetColumnMode(GPIO::Mode mode);
-
         int GetRow();
+        static Button GetButton(int row, int column);
 
     public:
         Keyboard(GPIO_TypeDef *peripheral, GPIO::Pin R0, GPIO::Pin R1, GPIO::Pin R2, GPIO::Pin R3, GPIO::Pin C0, GPIO::Pin C1, GPIO::Pin C2, GPIO::Pin C3);
@@ -51,6 +69,8 @@ namespace Peripheral
         static void KeyboardCheckTask(void * args);
         static Keyboard * keyboard;
     };
+
+
 }
 
 

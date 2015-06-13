@@ -14,41 +14,7 @@ namespace PIR
         Timer = xTimerCreate(timerName, sensitivity / portTICK_PERIOD_MS, pdFALSE,
                              (void*)pirID, PIRManager::TimerHandler);
 
-        switch(Pin)
-        {
-            case GPIO::Pin::P0:
-                irqnType = EXTI0_IRQn;
-                break;
-            case GPIO::Pin::P1:
-                irqnType = EXTI1_IRQn;
-                break;
-            case GPIO::Pin::P2:
-                irqnType = EXTI2_IRQn;
-                break;
-            case GPIO::Pin::P3:
-                irqnType = EXTI3_IRQn;
-                break;
-            case GPIO::Pin::P4:
-                irqnType = EXTI4_IRQn;
-                break;
-            case GPIO::Pin::P5:
-            case GPIO::Pin::P6:
-            case GPIO::Pin::P7:
-            case GPIO::Pin::P8:
-            case GPIO::Pin::P9:
-                irqnType = EXTI9_5_IRQn;
-                break;
-            case GPIO::Pin::P10:
-            case GPIO::Pin::P11:
-            case GPIO::Pin::P12:
-            case GPIO::Pin::P13:
-            case GPIO::Pin::P14:
-            case GPIO::Pin::P15:
-                irqnType = EXTI15_10_IRQn;
-                break;
-            default:
-                return;
-        }
+        irqnType = Interrupts::EXTIInt::get_irqn_type(Pin);
 
         InitInterrupt();
     }
