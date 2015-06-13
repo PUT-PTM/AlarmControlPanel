@@ -67,7 +67,6 @@ namespace Peripheral
         GPIO::Pin GetRowPin(uint8_t rowNumber);
 
         static void KeyboardCheckTask(void * args);
-        static Keyboard * keyboard;
     };
 
 

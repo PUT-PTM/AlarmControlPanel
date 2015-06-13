@@ -224,6 +224,7 @@ namespace Screen
         Redraw();
         switch(_mode)
         {
+            case Mode::Idle:
             case Mode::Menu:
                 _screen->SetDisplay(1,0,0);
                 break;
@@ -377,19 +378,5 @@ namespace Screen
         _interruptButton = button;
         _interrupt = true;
     }
-
-    void Interface::CheckForInterruptTask(void *args)
-    {
-        while(true)
-        {
-            while(Interface::interface == 0 || !Interface::interface->_interrupt) {}
-            debug("Interrupt is true.\n");
-
-            Interface::interface->AppendCharToInput(Interface::interface->_interruptButton);
-            Interface::interface->_interrupt = false;
-        }
-    }
-
-    Interface *Interface::interface = 0;
 }
 

@@ -78,17 +78,17 @@ namespace PIR
     {
         led4.turn_off();
 
-        if(pPirManager->_pir1.GPIOState()) {
+        if(ControlPanel::pirManager->_pir1.GPIOState()) {
             led1.toggle_state();
             events_log.emplace_back(Event{"Movement detected", "Sensor 1", "12:00", 1});
         }
 
-        if(pPirManager->_pir2.GPIOState()) {
+        if(ControlPanel::pirManager->_pir2.GPIOState()) {
             led2.toggle_state();
             events_log.emplace_back(Event{"Movement detected", "Sensor 2", "12:00", 1});
         }
 
-        if(pPirManager->_pir3.GPIOState()) {
+        if(ControlPanel::pirManager->_pir3.GPIOState()) {
             led3.toggle_state();
             events_log.emplace_back(Event{"Movement detected", "Sensor 3", "12:00", 1});
         }

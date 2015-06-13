@@ -1,8 +1,10 @@
 #include "main.hpp"
+/*
 #include "GPIO.hpp"
 #include "handlers.hpp"
 #include "Leds.hpp"
-
+#include "ControlPanel.hpp"
+*/
 int button_click_counter = 0;
 
 extern "C" {
@@ -43,12 +45,12 @@ extern "C" {
     void HAL_GPIO_EXTI_Callback(uint16_t pin)
     {
         GPIO::Pin gpiopin = static_cast<GPIO::Pin>(pin);
-        if( gpiopin == Peripheral::Keyboard::keyboard->GetRowPin(0) ||
-            gpiopin == Peripheral::Keyboard::keyboard->GetRowPin(1) ||
-            gpiopin == Peripheral::Keyboard::keyboard->GetRowPin(2) ||
-            gpiopin == Peripheral::Keyboard::keyboard->GetRowPin(3))
+        if( gpiopin == ControlPanel::keyboard->GetRowPin(0) ||
+            gpiopin == ControlPanel::keyboard->GetRowPin(1) ||
+            gpiopin == ControlPanel::keyboard->GetRowPin(2) ||
+            gpiopin == ControlPanel::keyboard->GetRowPin(3))
         {
-            Peripheral::Keyboard::keyboard->InterruptHandler(gpiopin);
+            ControlPanel::keyboard->InterruptHandler(gpiopin);
             return;
         }
 
@@ -58,16 +60,17 @@ extern "C" {
                 EXTI1_IRQHandlerCpp();
                 break;
             case GPIO_PIN_6:
-                pPirManager->InterruptHandler(1);
+                //ControlPanel::pirManager->InterruptHandler(1);
+                ControlPanel::pirManager->InterruptHandler(1);
                 break;
             case GPIO_PIN_7:
-                pPirManager->InterruptHandler(2);
+                ControlPanel::pirManager->InterruptHandler(2);
                 break;
             case GPIO_PIN_8:
-                pPirManager->InterruptHandler(3);
+                ControlPanel::pirManager->InterruptHandler(3);
                 break;
             case GPIO_PIN_9:
-                pPirManager->InterruptHandler(4);
+                ControlPanel::pirManager->InterruptHandler(4);
                 break;
         }
 

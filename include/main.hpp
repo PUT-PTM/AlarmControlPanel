@@ -9,22 +9,18 @@
 #include "interrupts.hpp"
 #include "FreeRTOS.h"
 #include "task.h"
-#include "handlers.hpp"
 #include "Peripheral.hpp"
 #include "timers.h"
 #include "PIR.hpp"
 #include "Keyboard.hpp"
 #include "Screen.hpp"
-//#include "ControlPanel.hpp"
-
-extern Screen::Interface *interface;
-extern PIR::PIRManager *pPirManager;
+#include "ControlPanel.hpp"
+#include "handlers.hpp"
 
 extern Leds led1;
 extern Leds led2;
 extern Leds led3;
 extern Leds led4;
-void InterruptDebug(char *message);
 
 extern void *pvPortMalloc( size_t xWantedSize );
 extern void vPortFree( void *pv );

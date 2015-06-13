@@ -42,13 +42,53 @@ namespace Screen
         void SetCursorPosition(bool line, uint8_t pos);
 	};
 
+    struct MenuElement
+    {
+        enum class Type : uint8_t
+        {
+            None,
+            BoolSetting,
+            InputSetting,
+            Catalog
+        };
+
+        const uint8_t maxDisplayString = 10;
+
+        std::string name;
+        std::string displayString;
+        Type type;
+
+        bool *changedSetting;
+
+        MenuElement(Type type, std::string name, std::string displayString)
+        :   type(type), name(name), displayString(displayString)
+        {
+            if(displayString.length() > maxDisplayString)
+                displayString = displayString.substr(maxDisplayString);
+        }
+
+        MenuElement(Type type, std::string name, std::string displayString, bool *boolSetting)
+        :   type(type), name(name), displayString(displayString), changedSetting(boolSetting)
+        {
+            if(displayString.length() > maxDisplayString)
+                displayString = displayString.substr(maxDisplayString);
+        }
+    };
+
+    struct Menu
+    {
+        std::string menuName;
+        std::vector <MenuElement> positions;
+    };
+
     class Interface
     {
     public:
         enum class Mode : uint8_t
         {
-            Menu = 0,
-            Input = 1
+            Idle = 0,
+            Menu = 1,
+            Input = 2
         };
         
     private:
@@ -56,7 +96,7 @@ namespace Screen
         const uint8_t _height = 2;
 
         LCD *_screen;
-        Mode _mode = Mode::Menu;
+        Mode _mode = Mode::Idle;
 
         std::vector <std::string> _menuArray;
         uint8_t _menuArrayLength;
@@ -71,13 +111,12 @@ namespace Screen
         volatile Peripheral::Keyboard::Button _interruptButton = Peripheral::Keyboard::Button::None;
         
     public:
-        static Interface* interface;
-
         Interface(LCD *screen);        
 
         LCD *GetLCD();
 
         void SetMenu(std::vector<std::string> menuArray);
+        void SetMenu(Menu menu);
         void SetMenuPosition(uint8_t position);
         void SetMode(Mode mode);
 
@@ -94,8 +133,6 @@ namespace Screen
         void AppendCharToInput(Peripheral::Keyboard::Button button);
         void SetInput(std::string input);
         void Interrupt(Peripheral::Keyboard::Button button);
-
-        static void CheckForInterruptTask(void *args);
         
         std::string GetInput();
     };

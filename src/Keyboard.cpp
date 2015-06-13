@@ -23,7 +23,6 @@ namespace Peripheral
     {
         SetColumnState(true);
         EnableInterrupt();
-        keyboard = this;
     }
 
     void Keyboard::SetColumnState(bool state)
@@ -99,9 +98,8 @@ namespace Peripheral
         SetColumnState(true);
         debug("LastPressed: %d\n", row*4 + column);
 
-        if(Screen::Interface::interface != 0 && GetButton(row, column) != Button::None)
-            //Screen::Interface::interface->AppendCharToInput(GetButton(row, column));
-            Screen::Interface::interface->Interrupt(GetButton(row, column));
+        if(GetButton(row, column) != Button::None)
+            ControlPanel::KeyboardInterrupt(GetButton(row, column));
     }
 
     GPIO::Pin Keyboard::GetRowPin(uint8_t rowNumber)
@@ -173,6 +171,4 @@ namespace Peripheral
             default: return Button::None;
         }
     }
-
-    Keyboard * Keyboard::keyboard = 0;
 }
