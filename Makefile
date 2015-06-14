@@ -3,11 +3,16 @@
 PROJ_NAME=hal
 
 # sources' directories
-SRCS         := $(wildcard src/*.c) $(wildcard lib/FreeRTOS/*.c)
-SRCSCPP      := $(wildcard src/*.cpp)
+SRCS         := $(wildcard src/*.c) $(wildcard lib/FreeRTOS/*.c) $(wildcard lib/enc28j60/*.c)
+SRCSCPP      := $(wildcard src/*.cpp) $(wildcard lib/httpserver/src/*.cpp)
 
 # headers' directories
-CINCS += -Iinclude -Ilib/stm32cubef4/include -Ilib/stm32cubef4/include/Legacy -Ilib/FreeRTOS/include -Ilib/rapidjson/include/rapidjson
+CINCS := -Iinclude -Ilib/stm32cubef4/include -Ilib/stm32cubef4/include/Legacy 
+CINCS += -Ilib/FreeRTOS/include 
+CINCS += -Ilib/enc28j60/include
+CINCS += -Ilib/httpserver/include
+CINCS += -Ilib/rapidjson/include/rapidjson
+
 
 # build directory configuration
 BUILDDIR  := build
@@ -32,7 +37,7 @@ OBJCOPY=arm-none-eabi-objcopy
 
 
 # C compiler's options
-CFLAGS := -Wall -std=c11 -Os
+CFLAGS := -Wall -std=c11
 CFLAGS += -mlittle-endian -mthumb -mcpu=cortex-m4 -mthumb-interwork
 CFLAGS += -mfpu=fpv4-sp-d16 -mfloat-abi=softfp
 CFLAGS += -fdata-sections -ffunction-sections
@@ -40,7 +45,7 @@ CFLAGS += $(DEFINES)
 
 # Cpp compiler's settings
 CPP=arm-none-eabi-g++
-CPPFLAGS := -Wall -std=c++1y -Os
+CPPFLAGS := -Wall -std=c++1y
 CPPFLAGS += -mlittle-endian -mthumb -mcpu=cortex-m4 -mthumb-interwork
 CPPFLAGS += -mfpu=fpv4-sp-d16 -mfloat-abi=softfp
 CPPFLAGS += -fdata-sections -ffunction-sections
@@ -50,7 +55,7 @@ CPPFLAGS += $(DEFINES)
 LDSRCS    := ldscripts/libs.ld ldscripts/mem.ld ldscripts/sections.ld
 
 # linker's settings
-LDFLAGS := $(LDSRCS:%=-T%) -specs nosys.specs --specs=rdimon.specs -lc -lrdimon -Wl,--gc-sections
+LDFLAGS := $(LDSRCS:%=-T%) -specs=rdimon.specs -Wl,--gc-sections
 
 
 # advanced settings
@@ -65,12 +70,12 @@ LDFLAGS := $(LDSRCS:%=-T%) -specs nosys.specs --specs=rdimon.specs -lc -lrdimon 
 
 .SUFFIXES:
 
-debug: CFLAGS   += -g
-debug: CPPFLAGS += -g -DDEBUG
+debug: CFLAGS   += -ggdb -Og -DDEBUG
+debug: CPPFLAGS += -ggdb -Og -DDEBUG
 debug: proj
 all: proj
-release: CFLAGS   += -Os
-release: CPPFLAGS += -Os
+release: CFLAGS   += -O2
+release: CPPFLAGS += -O2
 release: proj
 
 depends: link_needed_lib
@@ -119,7 +124,7 @@ proj: $(PROJ_NAME).elf
 
 $(PROJ_NAME).elf: $(OBJS) $(OBJSLIB) $(OBJSCPP)
 	@echo "  (LDCPP) -o $@ $^"
-	@$(CPP) $(CPPFLAGS) $(LDFLAGS) $(CINCS) -o $@ $^ src/startup_stm32f407xx.s $(LDLIBS)
+	@$(CPP) -o $@ $^ src/startup_stm32f407xx.s $(CPPFLAGS) $(LDFLAGS) $(CINCS)  $(LDLIBS)
 	$(OBJCOPY) -O ihex $(PROJ_NAME).elf $(PROJ_NAME).hex
 	$(OBJCOPY) -O binary $(PROJ_NAME).elf $(PROJ_NAME).bin
 
@@ -142,9 +147,13 @@ $(BUILDDIR):
 	mkdir -p $(OBJSDIR)/src
 	mkdir -p $(OBJSDIR)/lib/stm32cubef4
 	mkdir -p $(OBJSDIR)/lib/FreeRTOS
+	mkdir -p $(OBJSDIR)/lib/enc28j60
+	mkdir -p $(OBJSDIR)/lib/httpserver/src
 	mkdir -p $(DEPSDIR)/src
 	mkdir -p $(DEPSDIR)/lib/stm32cubef4
 	mkdir -p $(DEPSDIR)/lib/FreeRTOS
+	mkdir -p $(DEPSDIR)/lib/enc28j60
+	mkdir -p $(DEPSDIR)/lib/httpserver/src
 	
 
 

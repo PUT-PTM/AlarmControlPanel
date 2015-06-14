@@ -74,4 +74,3 @@ namespace Interrupts {
 
     std::list<GPIO::GPIOPins> EXTIInt::interrupt_list;
 }
-

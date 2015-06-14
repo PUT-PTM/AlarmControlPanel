@@ -10,6 +10,19 @@ Leds led2({GPIO::Pin::P13});
 Leds led3({GPIO::Pin::P14});
 Leds led4({GPIO::Pin::P15});
 
+// TCP Stack - IP configuration
+uint8_t ucMACAddress[ 6 ] = { 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff };
+static const uint8_t ucIPAddress[ 4 ] = { 192, 168, 0, 2 };
+static const uint8_t ucNetMask[ 4 ] = { 255, 255, 255, 0 };
+static const uint8_t ucGatewayAddress[ 4 ] = { 192, 168, 0, 100 };
+
+// The following is the address of an OpenDNS server.
+static const uint8_t ucDNSServerAddress[ 4 ] = { 208, 67, 222, 222 };
+
+void prvInitEthernet( void *pvParameters );
+void prvPingTask(void *pvParameters);
+
+
 int main()
 {
     /* STM32F4xx HAL library initialization:
@@ -22,12 +35,22 @@ int main()
        - Low Level Initialization
      */
     HAL_Init();
-    HAL_NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_4);
 
     /* Configure the system clock to 168 MHz */
     SystemClock_Config();
+
+    HAL_NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_4);
+
+    FreeRTOS_IPInit( ucIPAddress,
+                     ucNetMask,
+                     ucGatewayAddress,
+                     ucDNSServerAddress,
+                     ucMACAddress );
+
+    SystemClock_Config();
     debug("Creating tasks...\n");
     xTaskCreate(ControlPanel::InitializeTask, "InitAll", 3000, NULL, 4, NULL);
+    xTaskCreate(prvInitEthernet, "InitEnc28j60", 1000, NULL, 4, NULL);
 
     debug("Starting task scheduler...\n");
     
@@ -40,4 +63,46 @@ int main()
 
     return 0;
 }
+
+void prvInitEthernet( void *pvParameters )
+{
+    vTaskSuspendAll();
+
+	GPIO_InitTypeDef GPIO_InitStruct;
+
+    // Initialize button int
+	GPIO_InitStruct.Pin       = GPIO_PIN_0;
+    GPIO_InitStruct.Mode      = GPIO_MODE_IT_RISING;
+    GPIO_InitStruct.Pull      = GPIO_NOPULL;
+    GPIO_InitStruct.Speed     = GPIO_SPEED_LOW;
+    GPIO_InitStruct.Alternate = 0;
+
+    HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+    IRQn_Type irqn_line = EXTI0_IRQn;
+    HAL_NVIC_SetPriority(irqn_line, 7, 7);
+    HAL_NVIC_EnableIRQ(irqn_line);
+
+    debug("enc28j60: init\n");
+    enc28j60_init(ucMACAddress);
+    uint8_t revision_id = 0;
+    revision_id = enc28j60_rcr(EREVID);
+    debug("enc28j60: revision %#x\n", revision_id);
+    debug("enc28j60: checked MAC address %x:%x:%x:%x:%x:%x filter: %x\n",
+            enc28j60_rcr(MAADR5), enc28j60_rcr(MAADR4), enc28j60_rcr(MAADR3),
+            enc28j60_rcr(MAADR2), enc28j60_rcr(MAADR1), enc28j60_rcr(MAADR0),
+            enc28j60_rcr(ERXFCON));
+    xTaskResumeAll();
+    vTaskDelete(NULL);
+}
+
+void prvPingTask(void *pvParameters)
+{
+    for(;;) {
+        debug("Sending ping request...\n");
+        FreeRTOS_SendPingRequest(FreeRTOS_inet_addr("192.168.0.1") , 8, 100 / portTICK_PERIOD_MS );
+        vTaskDelay(2000);
+    }
+}
+
 

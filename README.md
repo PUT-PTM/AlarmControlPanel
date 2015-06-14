@@ -16,3 +16,6 @@ It needs openocd started with `arm semihosting enable`.
 
     make depends && make debug
 
+# enc28j60
+Original source code taken from http://www.elektroda.pl/rtvforum/topic2394580.html
+Modified version taken from https://github.com/Plytirex/FreeRTOS-TCP-enc28j60
