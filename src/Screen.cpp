@@ -446,6 +446,12 @@ namespace Screen
         if(_mode == Mode::Input) Redraw();
     }
 
+    void Interface::SetInput(std::string input)
+    {
+        _input = input;
+        if(_mode == Mode::Input) Redraw();
+    }
+
     std::string Interface::GetInput()
     {
         return _input;
@@ -455,7 +461,7 @@ namespace Screen
     {
         _screen->WriteCharAt(character, 1, _input.length());
         _input = _input + character;
-    }
+    }    
 
     void Interface::AppendCharToInput(Peripheral::Keyboard::Button button)
     {
