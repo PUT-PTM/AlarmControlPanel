@@ -20,7 +20,7 @@ extern "C" {
         if( eNetworkEvent == eNetworkUp )
         {
             debug("vApplicationIP: network up.\n");
-            if (xTaskCreate(HttpserverTask, "Httpserver", 12000, NULL, 1, NULL) != pdPASS)
+            if (xTaskCreate(HttpserverTask, "Httpserver", 12000, NULL, 3, NULL) != pdPASS)
                 debug("!! Creation of Httpserver task failed.\n");
         } else if ( eNetworkEvent == eNetworkDown) {
             debug("vApplicationIP: network down.\n");

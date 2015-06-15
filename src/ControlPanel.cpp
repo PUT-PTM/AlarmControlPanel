@@ -67,7 +67,7 @@ void ControlPanel::InitializeKeyboard()
 
     debug("Interface: Creating task for keyboard interrupt checking...\n");
     // Task needed for checking if a button has been pressed on the keyboard.
-    xTaskCreate(CheckKeyboardEntry, "KeyboardInterruptCheck", 1000, NULL, 4, NULL);
+    xTaskCreate(CheckKeyboardEntry, "KeyboardInterruptCheck", 1000, NULL, 3, NULL);
 
     debug("Keyboard initialization successful.\n");
 }
