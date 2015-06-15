@@ -11,10 +11,20 @@ void vReleaseNetworkBufferAndDescriptor( xNetworkBufferDescriptor_t * const pxNe
 
 BaseType_t xNetworkInterfaceInitialise( void ) 
 {
+    debug("enc28j60: initializing...");
     extern uint8_t ucMACAddress[ 6 ];
     if ( enc28j60_init(ucMACAddress) == 0 ) {
+        debug("......success!\n");
+        uint8_t revision_id = 0;
+        revision_id = enc28j60_rcr(EREVID);
+        debug("enc28j60: revision %#x\n", revision_id);
+        debug("enc28j60: checked MAC address %x:%x:%x:%x:%x:%x filter: %x\n",
+            enc28j60_rcr(MAADR5), enc28j60_rcr(MAADR4), enc28j60_rcr(MAADR3),
+            enc28j60_rcr(MAADR2), enc28j60_rcr(MAADR1), enc28j60_rcr(MAADR0),
+            enc28j60_rcr(ERXFCON));
         return pdPASS;
     } else {
+        debug("......FAILED!\n");
         return pdFAIL;
     }
 }

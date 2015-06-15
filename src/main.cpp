@@ -47,10 +47,8 @@ int main()
                      ucDNSServerAddress,
                      ucMACAddress );
 
-    SystemClock_Config();
     debug("Creating tasks...\n");
-    xTaskCreate(ControlPanel::InitializeTask, "InitAll", 3000, NULL, 4, NULL);
-    xTaskCreate(prvInitEthernet, "InitEnc28j60", 1000, NULL, 4, NULL);
+    xTaskCreate(ControlPanel::InitializeTask, "InitAll", 3000, NULL, 3, NULL);
 
     debug("Starting task scheduler...\n");
     
@@ -64,37 +62,6 @@ int main()
     return 0;
 }
 
-void prvInitEthernet( void *pvParameters )
-{
-    vTaskSuspendAll();
-
-	GPIO_InitTypeDef GPIO_InitStruct;
-
-    // Initialize button int
-	GPIO_InitStruct.Pin       = GPIO_PIN_0;
-    GPIO_InitStruct.Mode      = GPIO_MODE_IT_RISING;
-    GPIO_InitStruct.Pull      = GPIO_NOPULL;
-    GPIO_InitStruct.Speed     = GPIO_SPEED_LOW;
-    GPIO_InitStruct.Alternate = 0;
-
-    HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-
-    IRQn_Type irqn_line = EXTI0_IRQn;
-    HAL_NVIC_SetPriority(irqn_line, 7, 7);
-    HAL_NVIC_EnableIRQ(irqn_line);
-
-    debug("enc28j60: init\n");
-    enc28j60_init(ucMACAddress);
-    uint8_t revision_id = 0;
-    revision_id = enc28j60_rcr(EREVID);
-    debug("enc28j60: revision %#x\n", revision_id);
-    debug("enc28j60: checked MAC address %x:%x:%x:%x:%x:%x filter: %x\n",
-            enc28j60_rcr(MAADR5), enc28j60_rcr(MAADR4), enc28j60_rcr(MAADR3),
-            enc28j60_rcr(MAADR2), enc28j60_rcr(MAADR1), enc28j60_rcr(MAADR0),
-            enc28j60_rcr(ERXFCON));
-    xTaskResumeAll();
-    vTaskDelete(NULL);
-}
 
 void prvPingTask(void *pvParameters)
 {
