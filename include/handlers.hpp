@@ -8,6 +8,7 @@
 #include "FreeRTOS_IP_Private.h"
 #include "FreeRTOS_Sockets.h"
 #include "task.h"
+#include "RTC.hpp"
 
 
 extern "C" {

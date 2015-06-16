@@ -10,43 +10,6 @@ int button_click_counter = 0;
 void HttpserverTask( void *pvParameters );
 
 extern "C" {
-    void vApplicationStackOverflowHook(TaskHandle_t xTask, signed char *pcTaskName) {
-        debug("FATAL EXCEPTION: Stack overflow\n");
-        exit(EXIT_FAILURE);
-    }
-
-    void vApplicationIPNetworkEventHook( eIPCallbackEvent_t eNetworkEvent )
-    {
-        if( eNetworkEvent == eNetworkUp )
-        {
-            debug("vApplicationIP: network up.\n");
-            if (xTaskCreate(HttpserverTask, "Httpserver", 12000, NULL, 3, NULL) != pdPASS)
-                debug("!! Creation of Httpserver task failed.\n");
-        } else if ( eNetworkEvent == eNetworkDown) {
-            debug("vApplicationIP: network down.\n");
-        }
-    }
-
-    void vApplicationPingReplyHook( ePingReplyStatus_t eStatus, uint16_t usIdentifier )
-    {
-        switch( eStatus )
-        {
-            case eSuccess    :
-                /* A valid ping reply has been received.  Post the sequence number
-                   on the queue that is read by the vSendPing() function below.  Do
-                   not wait more than 10ms trying to send the message if it cannot be
-                   sent immediately because this function is called from the TCP/IP
-                   RTOS task - blocking in this function will block the TCP/IP RTOS task. */
-                debug("vAppPingReply: Received ping reply.\n");
-                break;
-
-            case eInvalidChecksum :
-            case eInvalidData :
-                /* A reply was received but it was not valid. */
-                break;
-        }
-    }
-
     void SysTick_Handler(void)
     {
         HAL_IncTick();
@@ -121,6 +84,45 @@ extern "C" {
                 break;
         }
 
+    }
+}
+
+void vApplicationStackOverflowHook(TaskHandle_t xTask, signed char *pcTaskName) {
+    debug("FATAL EXCEPTION: Stack overflow\n");
+    exit(EXIT_FAILURE);
+}
+
+void vApplicationPingReplyHook(ePingReplyStatus_t eStatus, uint16_t usIdentifier) {
+    switch( eStatus )
+    {
+        case eSuccess    :
+            /* A valid ping reply has been received.  Post the sequence number
+               on the queue that is read by the vSendPing() function below.  Do
+               not wait more than 10ms trying to send the message if it cannot be
+               sent immediately because this function is called from the TCP/IP
+               RTOS task - blocking in this function will block the TCP/IP RTOS task. */
+            debug("vAppPingReply: Received ping reply.\n");
+            break;
+
+        case eInvalidChecksum :
+        case eInvalidData :
+            /* A reply was received but it was not valid. */
+            break;
+    }
+}
+void prvPingTask(void *pvParameters);
+void vApplicationIPNetworkEventHook(eIPCallbackEvent_t eNetworkEvent) {
+    if( eNetworkEvent == eNetworkUp )
+    {
+        debug("vApplicationIP: network up.\n");
+
+        xTaskCreate(prvPingTask, "pingtask", 1000, NULL, 3, NULL);
+        xTaskCreate(DateTime::initialize, "InitDateTime", 1000, NULL, 3, NULL);
+
+        if (xTaskCreate(HttpserverTask, "Httpserver", 12000, NULL, 3, NULL) != pdPASS)
+            debug("!! Creation of Httpserver task failed.\n");
+    } else if ( eNetworkEvent == eNetworkDown) {
+        debug("vApplicationIP: network down.\n");
     }
 }
 
