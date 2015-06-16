@@ -1,7 +1,7 @@
 #include "RTC.hpp"
 
 void DateTime::initialize(void *ignored) {
-    debug("Initializing RTC\n");
+    debug("RTC: Initializing RTC\n");
 
     handle.Instance = RTC;
     handle.Init.HourFormat = RTC_HOURFORMAT_24;
@@ -13,7 +13,7 @@ void DateTime::initialize(void *ignored) {
 
     if(HAL_RTC_Init(&handle) != HAL_OK) {
         /* Initialization Error */
-        debug("RTC initialization error\n");
+        debug("RTC: RTC initialization error\n");
         while(true)
             ;
     }
@@ -23,9 +23,15 @@ void DateTime::initialize(void *ignored) {
         /* Configure RTC Calendar */
         configure_calendar();
     }
+
+    debug("RTC: INITIALIZED\n");
+
+    vTaskDelete(NULL);
 }
 
-void DateTime::send_request(xSocket_t socket) {
+void DateTime::send_request() {
+    debug("RTC: Sending request\n");
+
     std::stringstream ss;
     ss << "GET /" << "?tz=Europe/Warsaw HTTP/1.1\r\n"
     << "Host: time.dpieczynski.pl\r\n"
@@ -33,93 +39,111 @@ void DateTime::send_request(xSocket_t socket) {
     << "Accept: application/json\r\n"
     << "\r\n\r\n";
     std::string request = ss.str();
-    
-    if (FreeRTOS_send(socket, request.c_str(), request.length(), 0) != request.length()) {
-        debug("Error sending request.\n");
+
+    if (FreeRTOS_send(current_socket, request.c_str(), request.length(), 0) != request.length()) {
+        debug("RTC: Error sending request.\n");
     }
 }
 
-std::string DateTime::receive_response(xSocket_t socket) {
+std::string DateTime::receive_response() {
+    debug("RTC: Receiving response\n");
+
     std::stringstream buffer;
 
     char chr;
-    while (FreeRTOS_recv(socket, &chr, 1, 0) > 0) {
+    while (FreeRTOS_recv(current_socket, &chr, 1, 0) > 0) {
         buffer << chr;
     }
-
-    FreeRTOS_shutdown(socket, FREERTOS_SHUT_RDWR);
-    FreeRTOS_closesocket(socket);
 
     std::string response = buffer.str();
     size_t end_of_header = response.find("\r\n\r\n") + 4;
 
+    debug("RTC: Reponse received\n");
+
     return response.substr(end_of_header);
 }
 
-void DateTime::configure_calendar() {
-    debug("Configuring calendar\n");
+uint8_t DateTime::convert_from_hex(int number) {
+    std::stringstream ss;
+    ss << number;
 
+    std::string hexadecimal = ss.str();
+    uint8_t converted = 0;
+
+    uint8_t current_power = hexadecimal.length() - 1;
+    for(const auto &chr : hexadecimal) {
+        converted += (chr - '0') * std::pow(16, current_power);
+        current_power--;
+    }
+
+    return converted;
+}
+
+JSON DateTime::download_time() {
     uint32_t host = FreeRTOS_gethostbyname("time.dpieczynski.pl");
     if ((host == 0)) {
-        debug("Error retrieving DNS information.\n");
-        return;
+        debug("RTC: Error retrieving DNS information.\n");
+        return JSON();
     }
 
-    debug("Creating FreeRTOS socket\n");
-    xSocket_t socket = FreeRTOS_socket(FREERTOS_AF_INET, FREERTOS_SOCK_STREAM,
-                                       FREERTOS_IPPROTO_TCP);
+    debug("RTC: Creating FreeRTOS socket\n");
+    current_socket = FreeRTOS_socket(FREERTOS_AF_INET, FREERTOS_SOCK_STREAM,
+                                     FREERTOS_IPPROTO_TCP);
 
-    if (socket == FREERTOS_INVALID_SOCKET) {
-        debug("Error creating socket.\n");
-        return;
+    if (current_socket == FREERTOS_INVALID_SOCKET) {
+        debug("RTC: Error creating socket.\n");
+        return JSON();
     }
 
-    debug("Binding to port\n");
-    uint16_t port = 80;
     struct freertos_sockaddr client;
-    client.sin_port = FreeRTOS_htons(port);
+    client.sin_port = FreeRTOS_htons(80);
     client.sin_addr = host;
-    if (FreeRTOS_bind(socket, &client, sizeof(&client)) != 0)
-    {
-        debug("Socket binding failed.\n");
+
+    if (FreeRTOS_connect(current_socket, &client, sizeof(client)) != 0) {
+        FreeRTOS_closesocket(current_socket);
+        debug("RTC: Socket connect failed.\n");
+        return JSON();
+    }
+
+    send_request();
+
+    return JSON(receive_response());
+}
+
+void DateTime::configure_calendar() {
+    debug("RTC: Configuring calendar\n");
+
+    JSON json = download_time();
+    if (json.is_empty()) {
+        // TODO: do something when time cannot be downloaded
         return;
     }
 
-    if (FreeRTOS_connect(socket, &client, sizeof(client)) != 0) {        
-        FreeRTOS_closesocket(socket);
-        debug("Socket connect failed.\n");
-        return;
-    }
-
-    send_request(socket);
-
-    rapidjson::Document document;
-    document.Parse(receive_response(socket).c_str());
-                           
-    RTC_DateTypeDef sdatestructure;
-    RTC_TimeTypeDef stimestructure;
+    debug("RTC: Time downloaded\n");
 
     /* Configure the Date */
-    sdatestructure.Year = document["year"].GetInt() - 2000;
-    sdatestructure.Month = document["month"].GetInt();
-    sdatestructure.Date = document["day"].GetInt();
-    sdatestructure.WeekDay = document["weekday"].GetInt();
+    RTC_DateTypeDef date;
+    date.Year = json.get<int>("year") - 2000;
+    date.Month = json.get<int>("month");
+    date.Date = convert_from_hex(json.get<int>("day"));
+    date.WeekDay = json.get<int>("weekday");
 
-    if(HAL_RTC_SetDate(&handle, &sdatestructure, RTC_FORMAT_BCD) != HAL_OK) {
+    if(HAL_RTC_SetDate(&handle, &date, RTC_FORMAT_BCD) != HAL_OK) {
         /* Initialization Error */
         while(true)
             ;
     }
 
     /* Configure the Time */
-    stimestructure.Hours = document["hour"].GetInt();
-    stimestructure.Minutes = document["minute"].GetInt();
-    stimestructure.Seconds = document["second"].GetInt();
-    stimestructure.TimeFormat = RTC_HOURFORMAT_24;
-    stimestructure.DayLightSaving = RTC_DAYLIGHTSAVING_NONE;
-    stimestructure.StoreOperation = RTC_STOREOPERATION_RESET;
+    RTC_TimeTypeDef time;
+    time.Hours = convert_from_hex(json.get<int>("hour"));
+    time.Minutes = convert_from_hex(json.get<int>("minute"));
+    time.Seconds = convert_from_hex(json.get<int>("second"));
+    time.TimeFormat = RTC_HOURFORMAT_24;
+    time.DayLightSaving = RTC_DAYLIGHTSAVING_NONE;
+    time.StoreOperation = RTC_STOREOPERATION_RESET;
 
-    if(HAL_RTC_SetTime(&handle, &stimestructure, RTC_FORMAT_BCD) != HAL_OK) {
+    if(HAL_RTC_SetTime(&handle, &time, RTC_FORMAT_BCD) != HAL_OK) {
         /* Initialization Error */
         while(true)
             ;
@@ -127,9 +151,13 @@ void DateTime::configure_calendar() {
 
     /* Writes a data in a RTC Backup data Register0 */
     HAL_RTCEx_BKUPWrite(&handle, RTC_BKP_DR0, 0x32F2);
+
+    /* Shutdown and close socket */
+    FreeRTOS_shutdown(current_socket, FREERTOS_SHUT_RDWR);
+    FreeRTOS_closesocket(current_socket);
 }
 
-void DateTime::get_date_and_time()
+std::tuple<uint8_t, uint8_t, uint8_t, uint8_t, uint8_t, uint8_t> DateTime::get_date_and_time()
 {
     RTC_DateTypeDef date;
     RTC_TimeTypeDef time;
@@ -137,8 +165,11 @@ void DateTime::get_date_and_time()
     HAL_RTC_GetTime(&handle, &time, RTC_FORMAT_BIN);
     HAL_RTC_GetDate(&handle, &date, RTC_FORMAT_BIN);
 
-    debug("%u:%u:%u\n", time.Hours, time.Minutes, time.Seconds);
-    debug("%u.%u.%u\n", date.Date, date.Month, 2000 + date.Year);
+    debug("RTC: TIME: %u:%u:%u\n", time.Hours, time.Minutes, time.Seconds);
+    debug("RTC: DATE: %u.%u.%u\n", date.Date, date.Month, 2000 + date.Year);
+
+    return std::make_tuple(date.Date, date.Month, 2000 + date.Year, time.Hours, time.Minutes, time.Seconds);
 }
 
 RTC_HandleTypeDef DateTime::handle;
+xSocket_t DateTime::current_socket;

@@ -116,11 +116,10 @@ void vApplicationIPNetworkEventHook(eIPCallbackEvent_t eNetworkEvent) {
     {
         debug("vApplicationIP: network up.\n");
 
-        xTaskCreate(prvPingTask, "pingtask", 1000, NULL, 3, NULL);
-        xTaskCreate(DateTime::initialize, "InitDateTime", 1000, NULL, 3, NULL);
+        xTaskCreate(DateTime::initialize, "InitDateTime", 1500, NULL, 3, NULL);
 
-        if (xTaskCreate(HttpserverTask, "Httpserver", 12000, NULL, 3, NULL) != pdPASS)
-            debug("!! Creation of Httpserver task failed.\n");
+        //if (xTaskCreate(HttpserverTask, "Httpserver", 12000, NULL, 3, NULL) != pdPASS)
+        //    debug("!! Creation of Httpserver task failed.\n");
     } else if ( eNetworkEvent == eNetworkDown) {
         debug("vApplicationIP: network down.\n");
     }
@@ -137,4 +136,3 @@ void EXTI1_IRQHandlerCpp()
         tickstart = HAL_GetTick();
     }
 }
-
