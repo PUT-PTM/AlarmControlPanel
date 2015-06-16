@@ -118,8 +118,8 @@ void vApplicationIPNetworkEventHook(eIPCallbackEvent_t eNetworkEvent) {
 
         xTaskCreate(DateTime::initialize, "InitDateTime", 1500, NULL, 3, NULL);
 
-        //if (xTaskCreate(HttpserverTask, "Httpserver", 12000, NULL, 3, NULL) != pdPASS)
-        //    debug("!! Creation of Httpserver task failed.\n");
+        if (xTaskCreate(HttpserverTask, "Httpserver", 6000, NULL, 3, NULL) != pdPASS)
+            debug("!! Creation of Httpserver task failed.\n");
     } else if ( eNetworkEvent == eNetworkDown) {
         debug("vApplicationIP: network down.\n");
     }
