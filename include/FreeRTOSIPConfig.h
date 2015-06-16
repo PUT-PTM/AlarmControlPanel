@@ -206,7 +206,7 @@ ipconfigMAXIMUM_DISCOVER_TX_PERIOD.  The IP stack will revert to using the
 static IP address passed as a parameter to FreeRTOS_IPInit() if the
 re-transmission time interval reaches ipconfigMAXIMUM_DISCOVER_TX_PERIOD without
 a DHCP reply being received. */
-#define ipconfigMAXIMUM_DISCOVER_TX_PERIOD		( 120000 / portTICK_PERIOD_MS )
+#define ipconfigMAXIMUM_DISCOVER_TX_PERIOD		( 60000 / portTICK_PERIOD_MS )
 
 /* The ARP cache is a table that maps IP addresses to MAC addresses.  The IP
 stack can only send a UDP message to a remove IP address if it knowns the MAC
@@ -247,7 +247,7 @@ not set to 1 then only FreeRTOS_indet_addr_quick() is available. */
 are available to the IP stack.  The total number of network buffers is limited
 to ensure the total amount of RAM that can be consumed by the IP stack is capped
 to a pre-determinable value. */
-#define ipconfigNUM_NETWORK_BUFFER_DESCRIPTORS		60
+#define ipconfigNUM_NETWORK_BUFFER_DESCRIPTORS		32
 
 /* A FreeRTOS queue is used to send events from application tasks to the IP
 stack.  ipconfigEVENT_QUEUE_LENGTH sets the maximum number of events that can
@@ -327,7 +327,7 @@ This has to do with the contents of the IP-packets: all 32-bit fields are
 TCP socket will use up to 2 x 6 descriptors, meaning that it can have 2 x 6
 outstanding packets (for Rx and Tx).  When using up to 10 TP sockets
 simultaneously, one could define TCP_WIN_SEG_COUNT as 120. */
-#define ipconfigTCP_WIN_SEG_COUNT		240
+#define ipconfigTCP_WIN_SEG_COUNT		120
 
 /* Each TCP socket has a circular buffers for Rx and Tx, which have a fixed
 maximum size.  Define the size of Rx buffer for TCP sockets. */

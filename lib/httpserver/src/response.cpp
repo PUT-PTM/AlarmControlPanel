@@ -34,7 +34,7 @@ const char *indexhtml =
 std::string Response::generate_response(const Html_file &file, Response::type res_type)
 {
     std::string response_str;
-    response_str.reserve(4000);
+    response_str.reserve(2000);
     debug("Generating message...");
     response_str += srv_info::http_version;
     response_str += Response::type_str[res_type];
