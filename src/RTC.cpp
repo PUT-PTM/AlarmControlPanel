@@ -26,19 +26,19 @@ void DateTime::initialize(void *ignored) {
 
     debug("RTC: INITIALIZED\n");
 
+    get_date_and_time();
+
     vTaskDelete(NULL);
 }
 
 void DateTime::send_request() {
     debug("RTC: Sending request\n");
 
-    std::stringstream ss;
-    ss << "GET /" << "?tz=Europe/Warsaw HTTP/1.1\r\n"
-    << "Host: time.dpieczynski.pl\r\n"
-    << "Connection: close"
-    << "Accept: application/json\r\n"
-    << "\r\n\r\n";
-    std::string request = ss.str();
+    std::string request = "GET /?tz=Europe/Warsaw HTTP/1.1\r\n"
+                          "Host: time.dpieczynski.pl\r\n"
+                          "Connection: close"
+                          "Accept: application/json\r\n"
+                          "\r\n\r\n";
 
     if (FreeRTOS_send(current_socket, request.c_str(), request.length(), 0) != request.length()) {
         debug("RTC: Error sending request.\n");
@@ -48,18 +48,17 @@ void DateTime::send_request() {
 std::string DateTime::receive_response() {
     debug("RTC: Receiving response\n");
 
-    std::stringstream buffer;
+    std::string response;
+    response.reserve(350);
 
     char chr;
     while (FreeRTOS_recv(current_socket, &chr, 1, 0) > 0) {
-        buffer << chr;
+        response += chr;
     }
 
-    std::string response = buffer.str();
+    debug("RTC: Response received\n");
+
     size_t end_of_header = response.find("\r\n\r\n") + 4;
-
-    debug("RTC: Reponse received\n");
-
     return response.substr(end_of_header);
 }
 
