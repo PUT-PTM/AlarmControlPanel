@@ -11,10 +11,10 @@ void vReleaseNetworkBufferAndDescriptor( xNetworkBufferDescriptor_t * const pxNe
 
 BaseType_t xNetworkInterfaceInitialise( void ) 
 {
-    debug("enc28j60: initializing...");
+    debug("enc28j60: initializing...\n");
     extern uint8_t ucMACAddress[ 6 ];
     if ( enc28j60_init(ucMACAddress) == 0 ) {
-        debug("......success!\n");
+        debug("enc28j60: initialization completed successfully!\n");
         uint8_t revision_id = 0;
         revision_id = enc28j60_rcr(EREVID);
         debug("enc28j60: revision %#x\n", revision_id);
