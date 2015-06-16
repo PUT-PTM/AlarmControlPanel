@@ -26,8 +26,6 @@ void DateTime::initialize(void *ignored) {
 
     debug("RTC: INITIALIZED\n");
 
-    get_date_and_time();
-
     vTaskDelete(NULL);
 }
 
