@@ -5,10 +5,7 @@ void* operator new[](std::size_t n) {return pvPortMalloc(n);}
 void  operator delete  (void* p) {vPortFree(p);}
 void  operator delete[](void* p) {vPortFree(p);}
 
-Leds led1({GPIO::Pin::P12});
-Leds led2({GPIO::Pin::P13});
-Leds led3({GPIO::Pin::P14});
-Leds led4({GPIO::Pin::P15});
+
 
 // TCP Stack - IP configuration
 uint8_t ucMACAddress[ 6 ] = { 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff };
@@ -22,6 +19,34 @@ static const uint8_t ucDNSServerAddress[ 4 ] = { 208, 67, 222, 222 };
 void prvInitEthernet( void *pvParameters );
 void prvPingTask(void *pvParameters);
 
+/**
+ * C++ version 0.4 char* style "itoa":
+ * Written by Lukás Chmela
+ * Released under GPLv3.
+ */
+char* itoa(int value, char* result, int base) {
+    // check that the base if valid
+    if (base < 2 || base > 36) { *result = '\0'; return result; }
+
+    char* ptr = result, *ptr1 = result, tmp_char;
+    int tmp_value;
+
+    do {
+        tmp_value = value;
+        value /= base;
+        *ptr++ = "zyxwvutsrqponmlkjihgfedcba9876543210123456789abcdefghijklmnopqrstuvwxyz" [35 + (tmp_value - value * base)];
+    } while ( value );
+
+    // Apply negative sign
+    if (tmp_value < 0) *ptr++ = '-';
+    *ptr-- = '\0';
+    while(ptr1 < ptr) {
+        tmp_char = *ptr;
+        *ptr--= *ptr1;
+        *ptr1++ = tmp_char;
+    }
+    return result;
+}
 
 int main()
 {
@@ -41,11 +66,13 @@ int main()
 
     HAL_NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_4);
 
+/*
     FreeRTOS_IPInit( ucIPAddress,
                      ucNetMask,
                      ucGatewayAddress,
                      ucDNSServerAddress,
                      ucMACAddress );
+                      */
 
     debug("Creating tasks...\n");
     xTaskCreate(ControlPanel::InitializeTask, "InitAll", 3000, NULL, 3, NULL);

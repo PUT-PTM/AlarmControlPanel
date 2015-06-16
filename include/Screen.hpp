@@ -3,6 +3,8 @@
 
 #include "GPIO.hpp"
 #include "Keyboard.hpp"
+#include "FreeRTOS.h"
+#include "timers.h"
 
 namespace Screen
 {
@@ -91,9 +93,11 @@ namespace Screen
     public:
         enum class Mode : uint8_t
         {
-            Idle = 0,
-            Menu = 1,
-            Input = 2
+            Undefinied,
+            Idle,
+            Menu,
+            Input,
+            Message
         };
         
     private:
@@ -108,13 +112,17 @@ namespace Screen
         uint8_t _menuPosition = 0;
         uint8_t _rowSelected = 0;
 
-        std::string _idleMessage = "SUPER CENTRALEX";
+        std::string _idleMessage = "DateTime is Null";
+        std::string _idleMessage2 = "1:  2:  3:  4: ";
 
         std::string _inputComment = "";
         std::string _input = "";
 
         std::string GetMenuFirstRow();
         std::string GetMenuSecondRow();
+
+        std::string _message;
+        Mode _beforeMessage;
         
     public:
         Interface(LCD *screen);        
@@ -145,9 +153,13 @@ namespace Screen
         void SetInputComment(std::string comment);
         void AppendCharToInput(char character);
         void AppendCharToInput(Peripheral::Keyboard::Button button);
+        void InputBackspace();
         void SetInput(std::string input);
         
-        std::string GetInput();
+        std::string GetInput(bool clearInput = true);
+
+        void DisplayMessage(std::string message);
+        void DisposeMessage(Mode newMode = Mode::Undefinied);
     };
 }
 

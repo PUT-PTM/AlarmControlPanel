@@ -45,6 +45,7 @@ namespace PIR
         PIRManager();
 
         void InterruptHandler(int pirId);
+        bool GetPirState(int pirId);
         static void StartTimer(void *pPirSensor, uint32_t whatever);
         static void TimerHandler(TimerHandle_t xTimer);
     };

@@ -67,29 +67,40 @@ namespace PIR
         portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
     }
 
+    bool PIRManager::GetPirState(int pirId)
+    {
+        switch(pirId)
+        {
+            case 1: return _pir1.GPIOState();
+            case 2: return _pir2.GPIOState();
+            case 3: return _pir3.GPIOState();
+            default: return false;
+        }
+    }
+
     void PIRManager::StartTimer(void *pPirSensor, uint32_t whatever)
     {
         PIRSensor *pir = (PIRSensor*)pPirSensor;
         xTimerStart(pir->Timer, 0);
-        led4.turn_on();
     }
 
     void PIRManager::TimerHandler(TimerHandle_t xTimer)
     {
-        led4.turn_off();
-
         if(ControlPanel::pirManager->_pir1.GPIOState()) {
-            led1.toggle_state();
+            debug("Movement: 1\n");
+            ControlPanel::PirMovement(1);
             events_log.emplace_back(Event{"Movement detected", "Sensor 1", "12:00", 1});
         }
 
         if(ControlPanel::pirManager->_pir2.GPIOState()) {
-            led2.toggle_state();
+            debug("Movement: 2\n");
+            ControlPanel::PirMovement(2);
             events_log.emplace_back(Event{"Movement detected", "Sensor 2", "12:00", 1});
         }
 
         if(ControlPanel::pirManager->_pir3.GPIOState()) {
-            led3.toggle_state();
+            debug("Movement: 3\n");
+            ControlPanel::PirMovement(3);
             events_log.emplace_back(Event{"Movement detected", "Sensor 3", "12:00", 1});
         }
     }

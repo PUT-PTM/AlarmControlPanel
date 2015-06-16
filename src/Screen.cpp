@@ -285,10 +285,19 @@ namespace Screen
         switch(_mode)
         {
             case Mode::Idle:
+                debug("New mode: Idle\n");
+                _screen->SetDisplay(1,0,0);
+                break;
             case Mode::Menu:
+                debug("New mode: Menu\n");
+                _screen->SetDisplay(1,0,0);
+                break;
+            case Mode::Message:
+                debug("New mode: Message\n");
                 _screen->SetDisplay(1,0,0);
                 break;
             case Mode::Input:
+                debug("New mode: Input\n");
                 _screen->SetDisplay(1,1,1);
                 break;
         }
@@ -361,15 +370,21 @@ namespace Screen
 
     void Interface::MoveUp()
     {
-        if(_currentMenu->parentMenu == 0) return;
+        if(_currentMenu->parentMenu == 0)
+            return;
         SetMenu(_currentMenu->parentMenu, _currentMenu->parentPosition, _currentMenu->parentRowSelected);
     }
 
     void Interface::MoveDown()
     {
         MenuElement * selectedElem = GetSelectedElement();
-        if(selectedElem->childMenu == 0) return;
+        if(selectedElem->childMenu == 0)
+        {
+            debug("Null menu, cannot go down\n");
+            return;
+        }
 
+        selectedElem->childMenu->parentMenu = _currentMenu;
         selectedElem->childMenu->parentPosition = _menuPosition;
         selectedElem->childMenu->parentRowSelected = _rowSelected;
 
@@ -389,6 +404,7 @@ namespace Screen
             case Mode::Idle:
                 _screen->Clear();
                 _screen->WriteStringAt(_idleMessage, 0, 0);
+                _screen->WriteStringAt(_idleMessage2, 1, 0);
                 break;
             case Mode::Input:
                 _screen->Clear();
@@ -408,6 +424,13 @@ namespace Screen
                 _screen->WriteCharAt(' ', !_rowSelected, 0);
 
                 DrawBoolValues();
+                break;
+            }
+            case Mode::Message:
+            {
+                _screen->Clear();
+                _screen->WriteStringAt(_message, 0, 0);
+                break;
             }
         }
     }
@@ -452,15 +475,18 @@ namespace Screen
         if(_mode == Mode::Input) Redraw();
     }
 
-    std::string Interface::GetInput()
+    std::string Interface::GetInput(bool clearInput)
     {
-        return _input;
+        std::string input = _input;
+        if(clearInput) SetInput("");
+        return input;
     }
 
     void Interface::AppendCharToInput(char character)
     {
         _screen->WriteCharAt(character, 1, _input.length());
         _input = _input + character;
+        debug("Current input: %s\n", _input.c_str());
     }    
 
     void Interface::AppendCharToInput(Peripheral::Keyboard::Button button)
@@ -518,6 +544,31 @@ namespace Screen
             default:
                 return;
         }
+    }
+
+    void Interface::InputBackspace()
+    {
+        _input = _input.substr(0, _input.length() - 1);
+        _screen->WriteCharAt(' ', 1, _input.length());
+    }
+
+    void Interface::DisplayMessage(std::string message)
+    {
+        _message = message;
+        if(_mode != Mode::Message)
+        {
+            _beforeMessage = _mode;
+            SetMode(Mode::Message);
+        }
+        else Redraw();
+    }
+
+    void Interface::DisposeMessage(Mode newMode)
+    {
+        if(newMode == Mode::Undefinied)
+            SetMode(_beforeMessage);
+        else
+            SetMode(newMode);
     }
 }
 
