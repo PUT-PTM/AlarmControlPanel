@@ -6,7 +6,8 @@
 struct Html_file {
     const char *filename;
     const char *filepath;
-    const char *filesize;
+    const char *mime_type;
+    int filesize;
     const char *last_modified;
     const char *content;
 };

@@ -43,9 +43,11 @@ std::string Response::generate_response(const Html_file &file, Response::type re
     response_str += std::string(file.last_modified);
     response_str += "\n";
     // TODO: response_str += ETag;
-    response_str += "Content-Type: text/html; charset=UTF-8\n";
+    response_str += "Content-Type: ";
+    response_str += std::string(file.mime_type);
+    response_str += "; charset=UTF-8\n";
     response_str += "Content-Length: ";
-    response_str +=std::string(file.filesize);
+    response_str += std::to_string(file.filesize);
     response_str += "Accept-Ranges: bytes\n";
     response_str += "Connection: close\n\n";
     response_str += file.content;
