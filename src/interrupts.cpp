@@ -70,6 +70,8 @@ namespace Interrupts {
             case GPIO::Pin::P14:
             case GPIO::Pin::P15: return EXTI15_10_IRQn;
         }
+
+        return (IRQn_Type)-100;
     }
 
     std::list<GPIO::GPIOPins> EXTIInt::interrupt_list;

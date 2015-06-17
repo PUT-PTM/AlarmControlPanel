@@ -318,6 +318,8 @@ void ControlPanel::KeyboardBehavior()
                 interface->DisposeMessage(Interface::Mode::Idle);
             break;
         }
+        default:
+            break;
     }
 }
 

@@ -59,9 +59,9 @@ namespace Screen
 
         static const uint8_t maxDisplayString = 15;
 
+        Type type;
         std::string name;
         std::string displayString;
-        Type type;
 
         bool *boolSetting = 0;
         

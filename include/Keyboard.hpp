@@ -53,7 +53,7 @@ namespace Peripheral
         GPIO::GPIOPins _C3;
 
         volatile bool _interrupt = false;
-        volatile int _lastPressTick = 0;
+        volatile unsigned int _lastPressTick = 0;
 
         void EnableInterrupt();
         void SetColumnState(bool state);

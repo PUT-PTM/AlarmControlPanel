@@ -300,6 +300,9 @@ namespace Screen
                 debug("New mode: Input\n");
                 _screen->SetDisplay(1,1,1);
                 break;
+            case Mode::Undefinied:
+                debug("Warning: Undefinied mode\n");
+                break;
         }
     }
 
@@ -432,6 +435,9 @@ namespace Screen
                 _screen->WriteStringAt(_message, 0, 0);
                 break;
             }
+            case Mode::Undefinied:
+                _screen->Clear();
+                break;
         }
     }
 
