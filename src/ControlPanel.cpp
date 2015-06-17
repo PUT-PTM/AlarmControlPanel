@@ -28,15 +28,12 @@ Settings::Settings()
 
 void Settings::SetSetting(std::string settingName, std::string settingValue)
 {
-    std::stringstream ss;
-    ss.str(settingValue);
-
     if(settingName == "armTime")
-        ss >> ArmDelay;
+        ArmDelay = std::stoi(settingValue);
     else if(settingName == "disarmTime")
-        ss >> DisarmTime;
+        DisarmTime = std::stoi(settingValue);
     else if(settingName == "pin")
-        ss >> Pin;
+        Pin = settingValue;
 }
 
 std::string Settings::GetSetting(std::string settingName)
