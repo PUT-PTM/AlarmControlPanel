@@ -44,7 +44,7 @@ int main()
                     ucMACAddress);
 
     debug("Creating tasks...\n");
-    xTaskCreate(ControlPanel::InitializeTask, "InitAll", 3000, NULL, 3, NULL);
+    xTaskCreate(ControlPanel::InitializeTask, "InitAll", 1000, NULL, 3, NULL);
 
     debug("Starting task scheduler...\n");
 

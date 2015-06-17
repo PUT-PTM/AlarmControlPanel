@@ -122,7 +122,7 @@ void ControlPanel::InitializeTask(void *args)
     InitializeKeyboard();
 
     debug("Starting idle updater task...\n");
-    xTaskCreate(UpdateIdleInformation, "IdleUpdater", 1000, NULL, 4, NULL);
+    xTaskCreate(UpdateIdleInformation, "IdleUpdater", 500, NULL, 4, NULL);
 
     debug("Control panel initialization successful.\n");
 

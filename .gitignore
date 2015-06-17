@@ -38,3 +38,8 @@ build
 
 # CodeLite
 *.project
+
+#Eclipse
+*.cproject
+.cproject
+.settings/
