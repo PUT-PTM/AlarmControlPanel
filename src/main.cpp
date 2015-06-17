@@ -66,19 +66,18 @@ int main()
 
     HAL_NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_4);
 
-/*
-    FreeRTOS_IPInit( ucIPAddress,
-                     ucNetMask,
-                     ucGatewayAddress,
-                     ucDNSServerAddress,
-                     ucMACAddress );
-                      */
+
+    FreeRTOS_IPInit(ucIPAddress,
+                    ucNetMask,
+                    ucGatewayAddress,
+                    ucDNSServerAddress,
+                    ucMACAddress);
 
     debug("Creating tasks...\n");
     xTaskCreate(ControlPanel::InitializeTask, "InitAll", 3000, NULL, 3, NULL);
 
     debug("Starting task scheduler...\n");
-    
+
     vTaskStartScheduler();
 
     while(true)
