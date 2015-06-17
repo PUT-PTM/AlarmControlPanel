@@ -26,6 +26,7 @@ class DateTime {
         static bool is_initialized() {return initialized;};
         static void configure_calendar();
         static std::tuple<uint8_t, uint8_t, uint8_t, uint8_t, uint8_t, uint8_t> get_date_and_time();
+        static std::string get_date_and_time_as_string();
 };
 
 #endif // RTC_HPP

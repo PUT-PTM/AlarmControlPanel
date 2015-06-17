@@ -170,6 +170,24 @@ std::tuple<uint8_t, uint8_t, uint8_t, uint8_t, uint8_t, uint8_t> DateTime::get_d
     return std::make_tuple(date.Date, date.Month, 2000 + date.Year, time.Hours, time.Minutes, time.Seconds);
 }
 
+std::string DateTime::get_date_and_time_as_string()
+{
+    RTC_DateTypeDef date;
+    RTC_TimeTypeDef time;
+
+    HAL_RTC_GetTime(&handle, &time, RTC_FORMAT_BIN);
+    HAL_RTC_GetDate(&handle, &date, RTC_FORMAT_BIN);
+
+    debug("RTC: TIME: %u:%u:%u\n", time.Hours, time.Minutes, time.Seconds);
+    debug("RTC: DATE: %u.%u.%u\n", date.Date, date.Month, 2000 + date.Year);
+
+    std::stringstream result;
+    result << time.Hours << ":" << time.Minutes << " "
+           << date.Date << "." << date.Month << "." << 2000 + date.Year;
+
+    return result.str();
+}
+
 RTC_HandleTypeDef DateTime::handle;
 xSocket_t DateTime::current_socket;
 bool DateTime::initialized = false;
