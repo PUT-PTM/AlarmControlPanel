@@ -48,6 +48,7 @@ std::string Response::generate_response(const Html_file &file, Response::type re
     response_str += "; charset=UTF-8\n";
     response_str += "Content-Length: ";
     response_str += std::to_string(file.filesize);
+    response_str += "\n";
     response_str += "Accept-Ranges: bytes\n";
     response_str += "Connection: close\n\n";
     response_str += file.content;

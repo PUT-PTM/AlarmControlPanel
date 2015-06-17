@@ -3,6 +3,7 @@ import argparse
 import locale
 import re
 import os
+import mimetypes
 from datetime import datetime
 
 class Unordered_map_gen:
@@ -45,7 +46,7 @@ def generate_file(input_path: str, output_path: str, html_filepath: str):
         filedir, filename = os.path.split(html_filepath)
         last_modified = get_last_modified_str(input_path)
         file_lines = []
-        mime_type = "text/html"
+        mime_type = mimetypes.guess_type(filename)[0]
         filesize = 0
 
         for line in input_file:
