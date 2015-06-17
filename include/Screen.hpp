@@ -112,7 +112,7 @@ namespace Screen
         uint8_t _menuPosition = 0;
         uint8_t _rowSelected = 0;
 
-        std::string _idleMessage = "DateTime is Null";
+        std::string _idleMessage = "DateTime N/A";
         std::string _idleMessage2 = "1:  2:  3:  4: ";
 
         std::string _inputComment = "";

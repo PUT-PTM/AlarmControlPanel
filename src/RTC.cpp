@@ -178,14 +178,20 @@ std::string DateTime::get_date_and_time_as_string()
     HAL_RTC_GetTime(&handle, &time, RTC_FORMAT_BIN);
     HAL_RTC_GetDate(&handle, &date, RTC_FORMAT_BIN);
 
-    debug("RTC: TIME: %u:%u:%u\n", time.Hours, time.Minutes, time.Seconds);
-    debug("RTC: DATE: %u.%u.%u\n", date.Date, date.Month, 2000 + date.Year);
+    std::string result;
+    result.reserve(15);
+    result += time.Hours >= 10 ? std::to_string(time.Hours) : "0" + std::to_string(time.Hours);
+    result += ":";
+    result += time.Minutes >= 10 ? std::to_string(time.Minutes) : "0" + std::to_string(time.Minutes);
+    result += " ";
+    result += date.Date >= 10 ? std::to_string(date.Date) : "0" + std::to_string(date.Date);
+    result += ".";
+    result += date.Month >= 10 ? std::to_string(date.Month) : "0" + std::to_string(date.Month);
+    result += ".";
+    result += std::to_string(2000 + date.Year);
 
-    std::stringstream result;
-    result << time.Hours << ":" << time.Minutes << " "
-           << date.Date << "." << date.Month << "." << 2000 + date.Year;
-
-    return result.str();
+    debug("DateTime: %s\n", result.c_str());
+    return result;
 }
 
 RTC_HandleTypeDef DateTime::handle;

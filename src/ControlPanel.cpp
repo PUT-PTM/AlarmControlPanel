@@ -1,5 +1,4 @@
 #include "ControlPanel.hpp"
-#include <string>
 
 class interface;
 uint8_t                 ControlPanel::_pirStates = 0;
@@ -135,12 +134,22 @@ void ControlPanel::UpdateIdleInformation(void *args)
 {
     while(true)
     {
+        if(interface->GetMode() == Screen::Interface::Mode::Idle)
+
+        if(DateTime::is_initialized() && interface->GetMode() == Screen::Interface::Mode::Idle)
+        {
+            //interface->SetIdleMessage(DateTime::get_date_and_time_as_string());
+            lcd->WriteStringAt(DateTime::get_date_and_time_as_string(), 0, 0);
+        }
+
         vTaskDelay(1000 / portTICK_PERIOD_MS);
         if(_pirStates & 1)
         {
             if(!pirManager->GetPirState(1))
             {
-                lcd->WriteCharAt(' ', 1, 2);
+                if(interface->GetMode() == Screen::Interface::Mode::Idle)
+                    lcd->WriteCharAt(' ', 1, 2);
+                    
                 _pirStates ^= 1;
                 _greenLed.set_state(false);
             }
@@ -150,7 +159,9 @@ void ControlPanel::UpdateIdleInformation(void *args)
         {
             if(!pirManager->GetPirState(2))
             {
-                lcd->WriteCharAt(' ', 1, 6);
+                if(interface->GetMode() == Screen::Interface::Mode::Idle)
+                    lcd->WriteCharAt(' ', 1, 6);
+
                 _pirStates ^= 1;
                 _greenLed.set_state(false);
             }
@@ -160,7 +171,9 @@ void ControlPanel::UpdateIdleInformation(void *args)
         {
             if(!pirManager->GetPirState(3))
             {
-                lcd->WriteCharAt(' ', 1, 10);
+                if(interface->GetMode() == Screen::Interface::Mode::Idle)
+                    lcd->WriteCharAt(' ', 1, 10);
+                    
                 _pirStates ^= 1;
                 _greenLed.set_state(false);
             }

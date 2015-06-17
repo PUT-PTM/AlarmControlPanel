@@ -3,6 +3,8 @@
 
 #include "main.hpp"
 #include "helpers.hpp"
+#include "RTC.hpp"
+#include <string>
 
 class PirSettings
 {
