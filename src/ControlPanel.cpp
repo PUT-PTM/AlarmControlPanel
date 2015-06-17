@@ -44,9 +44,9 @@ std::string Settings::GetSetting(std::string settingName)
 {
     char buffer[4];
     if(settingName == "armTime")
-        itoa(ArmDelay, buffer, 10);
+        ext::itoa(ArmDelay, buffer, 10);
     else if(settingName == "disarmTime")
-        itoa(DisarmTime, buffer, 10);
+        ext::itoa(DisarmTime, buffer, 10);
     else if(settingName == "pin")
         return Pin;
         
@@ -388,7 +388,7 @@ void ControlPanel::ArmTask(void *args)
         debug("Arming time: %d\n", i);
         if(interface->GetMode() == Screen::Interface::Mode::Message)
         {
-            itoa(settings.ArmDelay-i, iter, 10);
+            ext::itoa(settings.ArmDelay-i, iter, 10);
             interface->DisplayMessage(std::string("To exit: ") + std::string(iter) + std::string("s"));
         }
         vTaskDelay(300 / portTICK_PERIOD_MS);
@@ -422,7 +422,7 @@ void ControlPanel::EnterTimeTask(void *args)
         debug("Enter time: %d\n", i);
         if(interface->GetMode() == Screen::Interface::Mode::Message)
         {
-            itoa(settings.DisarmTime-i, iter, 10);
+            ext::itoa(settings.DisarmTime-i, iter, 10);
             interface->DisplayMessage(std::string("Time left: ") + std::string(iter) + std::string("s"));
         }
         vTaskDelay(300 / portTICK_PERIOD_MS);

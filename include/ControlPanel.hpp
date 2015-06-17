@@ -2,6 +2,7 @@
 #define CONTROLPANEL_HPP
 
 #include "main.hpp"
+#include "helpers.hpp"
 
 class PirSettings
 {

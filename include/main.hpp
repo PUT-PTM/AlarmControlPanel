@@ -1,11 +1,10 @@
 #ifndef MAIN_H
 #define MAIN_H
 
-char* itoa(int value, char* result, int base);
-
 #include <functional>
 #include <string>
 #include <unordered_map>
+#include <cmath>
 
 #include "system_config.hpp"
 #include "debug.h"
@@ -34,7 +33,6 @@ char* itoa(int value, char* result, int base);
 #include "ControlPanel.hpp"
 #include "handlers.hpp"
 
-
 extern Leds led1;
 extern Leds led2;
 extern Leds led3;
@@ -42,8 +40,6 @@ extern Leds led4;
 
 extern void *pvPortMalloc( size_t xWantedSize );
 extern void vPortFree( void *pv );
-
-
 
 extern "C" {
     // buffer allocation declaration
