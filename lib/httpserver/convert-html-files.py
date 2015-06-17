@@ -45,6 +45,7 @@ def generate_file(input_path: str, output_path: str, html_filepath: str):
         filedir, filename = os.path.split(html_filepath)
         last_modified = get_last_modified_str(input_path)
         file_lines = []
+        mime_type = "text/html"
         filesize = 0
 
         for line in input_file:
@@ -54,10 +55,12 @@ def generate_file(input_path: str, output_path: str, html_filepath: str):
             "Html_file htmlfile_{filesymbol} {{\n"
             "    \"{filename}\",\n"
             "    \"{filedir}\",\n"
+            "    \"{mime_type}\",\n"
             "    {filesize},\n"
             "    \"{last_modified}\",".format(filesymbol    = filesymbol,
                                              filename      = filename,
                                              filedir       = filedir,
+                                             mime_type     = mime_type,
                                              filesize      = filesize,
                                              last_modified = last_modified),
             file=output_file
