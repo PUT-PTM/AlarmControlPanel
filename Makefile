@@ -11,8 +11,6 @@ CINCS := -Iinclude -Ilib/stm32cubef4/include -Ilib/stm32cubef4/include/Legacy
 CINCS += -Ilib/FreeRTOS/include 
 CINCS += -Ilib/enc28j60/include
 CINCS += -Ilib/httpserver/include
-CINCS += -Ilib/rapidjson/include/rapidjson
-
 
 # build directory configuration
 BUILDDIR  := build
@@ -49,7 +47,7 @@ CPPFLAGS := -Wall -std=c++1y
 CPPFLAGS += -mlittle-endian -mthumb -mcpu=cortex-m4 -mthumb-interwork
 CPPFLAGS += -mfpu=fpv4-sp-d16 -mfloat-abi=softfp
 CPPFLAGS += -fdata-sections -ffunction-sections
-CPPFLAGS += $(DEFINES)
+CPPFLAGS += $(DEFINES) -D_GLIBCXX_USE_C99=1
 
 # linker's scripts
 LDSRCS    := ldscripts/libs.ld ldscripts/mem.ld ldscripts/sections.ld
