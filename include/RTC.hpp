@@ -20,8 +20,10 @@ class DateTime {
         static void send_request();
         static std::string receive_response();
         static JSON download_time();
+        static bool initialized;
     public:
         static void initialize(void *ignored);
+        static bool is_initialized() {return initialized;};
         static void configure_calendar();
         static std::tuple<uint8_t, uint8_t, uint8_t, uint8_t, uint8_t, uint8_t> get_date_and_time();
 };

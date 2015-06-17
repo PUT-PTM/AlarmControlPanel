@@ -25,6 +25,7 @@ void DateTime::initialize(void *ignored) {
     }
 
     debug("RTC: INITIALIZED\n");
+    initialized = true;
 
     vTaskDelete(NULL);
 }
@@ -38,7 +39,8 @@ void DateTime::send_request() {
                           "Accept: application/json\r\n"
                           "\r\n\r\n";
 
-    if (FreeRTOS_send(current_socket, request.c_str(), request.length(), 0) != request.length()) {
+    if (static_cast <size_t>(FreeRTOS_send(current_socket, request.c_str(), request.length(), 0))
+        != request.length()) {
         debug("RTC: Error sending request.\n");
     }
 }
@@ -170,3 +172,4 @@ std::tuple<uint8_t, uint8_t, uint8_t, uint8_t, uint8_t, uint8_t> DateTime::get_d
 
 RTC_HandleTypeDef DateTime::handle;
 xSocket_t DateTime::current_socket;
+bool DateTime::initialized = false;
