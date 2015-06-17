@@ -24,10 +24,10 @@ std::experimental::any JSON::deserialize_value(std::string value) {
         return std::experimental::any(std::regex_replace(value, quotation_mark_regex, ""));
     }
     else if (value.find("\\.") != value.npos) {
-        return std::experimental::any(lexical_cast<float>(value));
+        return std::experimental::any(std::stof(value));
     }
     else {
-        return std::experimental::any(lexical_cast<int>(value));
+        return std::experimental::any(std::stoi(value));
     }
 }
 
@@ -35,9 +35,7 @@ std::string JSON::get_representation(std::experimental::any value) {
     std::string value_type_name = value.type().name();
 
     if (value_type_name == "i") {
-        std::stringstream result;
-        result << std::experimental::any_cast<int>(value);
-        return std::string(result.str());
+        return std::to_string(std::experimental::any_cast<int>(value));
     }
     else if (value_type_name == "Ss") {
         std::string result = "\"";
@@ -52,32 +50,29 @@ std::string JSON::get_representation(std::experimental::any value) {
         return result;
     }
     else if (value_type_name == "d") {
-        std::stringstream result;
-        result << std::experimental::any_cast<double>(value);
-        return std::string(result.str());
+        return std::to_string(std::experimental::any_cast<double>(value));
     }
     else if (value_type_name == "f") {
-        std::stringstream result;
-        result << std::experimental::any_cast<float>(value);
-        return std::string(result.str());
+        return std::to_string(std::experimental::any_cast<float>(value));
     }
     else {
+        debug("TYPE: %s\n", value_type_name.c_str());
         return "";
     }
 }
 
 std::string JSON::serialize() {
-    unsigned long number_of_objects = inserted_objects.size();
+    size_t number_of_objects = inserted_objects.size();
 
     std::string serialized;
     if (number_of_objects > 1) {
         serialized += "[";
     }
 
-    for (int i = 0; i < number_of_objects; i++) {
+    for (size_t i = 0; i < number_of_objects; i++) {
         serialized += "{\n";
 
-        for (int j = inserted_objects[i].begin; j <= inserted_objects[i].end; j++) {
+        for (size_t j = inserted_objects[i].begin; j <= inserted_objects[i].end; j++) {
             serialized += "\"";
             serialized += inserted_indexes[j];
             serialized += "\": ";
@@ -106,6 +101,6 @@ std::string JSON::serialize() {
 }
 
 void JSON::add_object() {
-    unsigned int start_index = inserted_values.size();
+    size_t start_index = inserted_values.size();
     inserted_objects.emplace_back(Range{start_index, start_index - 1});
 }

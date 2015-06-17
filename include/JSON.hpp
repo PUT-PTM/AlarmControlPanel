@@ -5,11 +5,13 @@
 #include <regex>
 #include <unordered_map>
 #include <experimental/any>
+
+#include "helpers.hpp"
 #include "debug.h"
 
 struct Range {
-    int begin;
-    int end;
+    size_t begin;
+    size_t end;
 };
 
 class JSON {
@@ -20,17 +22,6 @@ class JSON {
         std::vector <Range> inserted_objects;
         std::experimental::any deserialize_value(std::string value);
         std::string get_representation(std::experimental::any value);
-
-        /* This is probably slow as hell */
-        template <typename T>
-        T lexical_cast(const std::string& str) {
-            T var;
-            std::istringstream iss;
-            iss.str(str);
-            iss >> var;
-            // Ignore any error bits that may have been set on the stream - YOLO
-            return var;
-        }
     public:
         JSON(std::string json_string);
         JSON() {};
