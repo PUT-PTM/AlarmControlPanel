@@ -31,8 +31,8 @@ like to use the other one.
     
 
 ### 1.3. Debug version: ###
-Debug version uses semehosting to print additional debug info using C `printf`, 
-which in addition slows program significantly. Openocd server started with `arm
+Debug version uses semihosting to print additional debug info using C `printf`, 
+which in addition slows program significantly. OpenOCD server started with `arm
 semihosting enable` is needed to enable semihosting. Debug build **can't be used**
 without semihosting server – otherwise the program will hang on first printf.
 
