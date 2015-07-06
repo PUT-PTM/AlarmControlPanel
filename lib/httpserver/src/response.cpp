@@ -36,6 +36,9 @@ std::string Response::generate_response(const Html_file &file, Response::type re
     std::string response_str;
     response_str.reserve(2000);
     debug("Generating message...");
+
+    // this is ugly as hell, but we need to use += (append)
+    // to reduce usage of copy constructor
     response_str += srv_info::http_version;
     response_str += Response::type_str[res_type];
     response_str += srv_info::server_version;

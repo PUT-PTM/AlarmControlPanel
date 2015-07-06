@@ -101,6 +101,7 @@ void HttpserverTask( void *pvParameters )
                 debug("== Parsed args: ==\n%d %s\n", req_data.req_type, req_data.url.c_str());
 
 
+                // if requested url doesn't exist
                 if (file_umap.count(req_data.url) == 0) {
                     std::string response_str = Response::generate_response(*file_umap["/404.html"], Response::type::NOT_FOUND);
                     debug("<< Sending message 404: >>..");
