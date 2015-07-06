@@ -1,3 +1,19 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [AlarmControlPanel [![Build Status](https://travis-ci.org/Plytirex/AlarmControlPanel.svg?branch=master)](https://travis-ci.org/Plytirex/AlarmControlPanel)](#alarmcontrolpanel-build-statushttpstravis-ciorgplytirexalarmcontrolpanelsvgbranchmasterhttpstravis-ciorgplytirexalarmcontrolpanel)
+  - [1. BUILD](#1-build)
+    - [1.1. Clone repo and submodules](#11-clone-repo-and-submodules)
+    - [1.2. Release version:](#12-release-version)
+    - [1.3. Debug version:](#13-debug-version)
+  - [3. Pins connection](#3-pins-connection)
+  - [4. Known Bugs / Troubleshooting](#4-known-bugs--troubleshooting)
+  - [5. Future plans](#5-future-plans)
+- [enc28j60 driver](#enc28j60-driver)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # AlarmControlPanel [![Build Status](https://travis-ci.org/Plytirex/AlarmControlPanel.svg?branch=master)](https://travis-ci.org/Plytirex/AlarmControlPanel)
 
 Alarm Control Panel is academic project written in C++ for Basics of Microprocessors
@@ -37,8 +53,8 @@ semihosting enable` is needed to enable semihosting. Debug build **can't be used
 without semihosting server – otherwise the program will hang on first printf.
 
     make depends && make debug
-    
- ## 2. Equipment ##
+
+## 2. Equipment ##
 
 | Item                  | Model             | Links                       |
 |-----------------------|-------------------|-----------------------------|
@@ -104,14 +120,14 @@ without semihosting server – otherwise the program will hang on first printf.
 
 ## 4. Known Bugs / Troubleshooting
 
-* internet connection is not stable - issue #13
+* internet connection is not stable - [issue #13](https://github.com/Plytirex/AlarmControlPanel/issues/13)
 * keys on membrane keyboard are not reliable - use better quality membrane keyboard
 
 ## 5. Future plans
 
-* wireless PIRs - issue #12
-* JSON Server and API with authentication - issue #10
-* microcontroller configuration to support battery power supplye - issue #6
+* wireless PIRs - [issue #12](https://github.com/Plytirex/AlarmControlPanel/issues/12)
+* JSON Server and API with authentication - [issue #10](https://github.com/Plytirex/AlarmControlPanel/issues/10)
+* microcontroller configuration to support battery power supplye - [issue #6](https://github.com/Plytirex/AlarmControlPanel/issues/6)
 * memory profiling to use memory more efficient (i.e. optimisation of FreeRTOS tasks stacks sizes)
 
 
