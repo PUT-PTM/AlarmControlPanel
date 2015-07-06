@@ -17,34 +17,6 @@ namespace Interrupts {
         }
 
         HAL_NVIC_DisableIRQ(irqn_type);
-        
-        /*
-        auto list_iter = find_gpiopins(interrupt_list, peripheral, pins_bitmask);
-        if (list_iter == interrupt_list.end()) {
-            debug("Interrupt GPIO: %x , pins_bitmask: %x hasn't been found.\n",
-                    reinterpret_cast<unsigned int>(peripheral),
-                    static_cast<unsigned int>(pins_bitmask.to_ulong()));
-            return;
-        } else {
-             interrupt_list.erase(list_iter);
-        }
-         */
-    }
-
-    std::list<GPIO::GPIOPins>::iterator EXTIInt::find_gpiopins(std::list<GPIO::GPIOPins> &gpiopins_list,
-                                                        GPIO_TypeDef *peripheral, std::bitset<16> pins_bitmask)
-    {
-        auto return_list_iter = gpiopins_list.end();
-        for (auto list_iter = gpiopins_list.begin();list_iter != gpiopins_list.end(); list_iter++)
-        {
-            if ( (*list_iter).get_peripheral() == peripheral
-               && (*list_iter).get_pins_bitmask() == pins_bitmask) {
-                return_list_iter = list_iter;
-                break;
-            }
-
-        }
-        return return_list_iter;
     }
 
     IRQn_Type EXTIInt::get_irqn_type(GPIO::Pin pin)
